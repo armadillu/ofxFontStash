@@ -56,12 +56,12 @@ class ofxFontStash{
 			
 		//if automaticBeginEnd == false you will need to manually call begin() and end(). This improves
 		//performance if you want to make several consecutive draw() calls
-		void draw( string text, float size, float x, float y, bool automaticBeginEnd = true );
+		void draw( string text, float size, int x, int y, bool automaticBeginEnd = true );
 
 		//same as draw, but scans the text for '\n' and starts a new line if found
 		//if automaticBeginEnd == false you will need to manually call begin() and end(). This improves
 		//performance if you want to make several consecutive draw() calls
-		void drawMultiLine( string text, float size, float x, float y, bool automaticBeginEnd = true );
+		void drawMultiLine( string text, float size, int x, int y, bool automaticBeginEnd = true );
 	
 		//to be used when drawing with automaticBeginEnd == false
 		inline void begin(){ sth_begin_draw(stash);	}
@@ -69,7 +69,7 @@ class ofxFontStash{
 		//to be used when drawing with automaticBeginEnd == false
 		inline void end(){ sth_end_draw(stash); }
 	
-		ofRectangle getBoundingBoxSize( string text, float size, float x, float y );
+		ofRectangle getBoundingBoxSize( string text, float size, int x, int y );
 
 	private:
 		

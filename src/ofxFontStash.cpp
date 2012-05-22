@@ -63,7 +63,7 @@ bool ofxFontStash::setup( string fontFile, float lineHeightPercent ){
 }
 
 
-void ofxFontStash::draw( string text, float size, float x, float y, bool automaticBeginEnd ){
+void ofxFontStash::draw( string text, float size, int x, int y, bool automaticBeginEnd ){
 	
 	if (stash != NULL){
 		
@@ -79,7 +79,7 @@ void ofxFontStash::draw( string text, float size, float x, float y, bool automat
 	}		
 }
 
-void ofxFontStash::drawMultiLine( string text, float size, float x, float y, bool automaticBeginEnd ){
+void ofxFontStash::drawMultiLine( string text, float size, int x, int y, bool automaticBeginEnd ){
 	
 	if (stash != NULL){
 		
@@ -102,7 +102,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y, boo
 	}		
 }
 
-ofRectangle ofxFontStash::getBoundingBoxSize( string text, float size, float x, float y ){
+ofRectangle ofxFontStash::getBoundingBoxSize( string text, float size, int x, int y ){
 
 	ofRectangle r;
 	sth_dim_text( stash, stashFontID, size, text.c_str(), &r.x, &r.y, &r.width, &r.height);

@@ -20,8 +20,8 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 	
-	int x = 50;
-	int y = 50;
+	float x = 50 + mouseX * 0.1;
+	float y = 50;
 	
 	string demoText = "This is my text in verdana font.";
 	float fontSize = 22.0f;
