@@ -28,7 +28,7 @@ void testApp::draw(){
 	
 	// simple demo //////////////////////////////////////////////////////////
 	
-	ofSetColor(255);//white
+	ofSetColor(255);
 	font.draw(
 				  demoText,	//text to draw
 				  fontSize,	//font size
@@ -40,8 +40,8 @@ void testApp::draw(){
 	// bounding box demo ///////////////////////////////////////////////////
 	
 	ofSetColor(255, 0, 0, 64);
-	ofRectangle r = font.getBoundingBoxSize( demoText, fontSize, x, y);
-	ofRect( r );
+	ofRectangle bbox = font.getBoundingBoxSize( demoText, fontSize, x, y);
+	ofRect( bbox );
 		
 	
 	// draw multiline text /////////////////////////////////////////////////
