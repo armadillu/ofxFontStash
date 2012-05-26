@@ -34,8 +34,8 @@
 
 // TODO: implement getBoundingBoxSize() for text with multiple lines!
 
-#ifndef fontsExample_ofxFontStash_h
-#define fontsExample_ofxFontStash_h
+#ifndef ofxFontStash_h
+#define ofxFontStash_h
 
 #include "ofMain.h"
 

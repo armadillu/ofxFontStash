@@ -12,10 +12,6 @@ void testApp::setup(){
 
 }
 
-//--------------------------------------------------------------
-void testApp::update(){
-
-}
 
 //--------------------------------------------------------------
 void testApp::draw(){
@@ -25,8 +21,11 @@ void testApp::draw(){
 	
 	string demoText = "This is my text in verdana font.";
 	float fontSize = 22.0f;
+		
 	
 	// simple demo //////////////////////////////////////////////////////////
+	
+	drawPoint(x, y);		//draw insertion point	
 	
 	ofSetColor(255);
 	font.draw(
@@ -46,18 +45,30 @@ void testApp::draw(){
 	
 	// draw multiline text /////////////////////////////////////////////////
 	
+	y = 150;
+	drawPoint(x, y);		//draw insertion point	
+	
 	ofSetColor(255);
 	string s = (string)"this paragraph has" + "\n" + "multiple lines.";
-	font.drawMultiLine( s,  fontSize, x, 3 * y);
+	font.drawMultiLine( s,  fontSize, x, y);
 	
 	
 	// batch drawing, optimized for multiple drawing calls /////////////////
 	
+	y = 250;
+	drawPoint(x, y);		//draw insertion point	
+	
+	ofSetColor(255);
 	font.begin();
 	for (int i = 0; i < 11; i++){
-		font.draw("my line #" + ofToString(i+1), fontSize, x, 6 * y + i * fontSize );
+		font.draw("my line #" + ofToString(i+1), fontSize, x, y + i * fontSize );
 	}
 	font.end();
 	
 }
 
+void testApp::drawPoint(float x, float y){
+	
+	ofSetColor(0, 255, 0, 128);	
+	ofCircle(x, y, 2);
+}

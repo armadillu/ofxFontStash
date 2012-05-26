@@ -105,10 +105,15 @@ void ofxFontStash::drawMultiLine( string text, float size, int x, int y, bool au
 ofRectangle ofxFontStash::getBoundingBoxSize( string text, float size, int x, int y ){
 
 	ofRectangle r;
-	sth_dim_text( stash, stashFontID, size, text.c_str(), &r.x, &r.y, &r.width, &r.height);
-	r.width = fabs (r.width - r.x);
-	r.height = fabs(r.x - r.height);
-	r.x = x;
-	r.y = y - r.height;
+
+	if (stash != NULL){
+		sth_dim_text( stash, stashFontID, size, text.c_str(), &r.x, &r.y, &r.width, &r.height);
+		r.width = fabs (r.width - r.x);
+		r.height = fabs(r.x - r.height);
+		r.x = x;
+		r.y = y - r.height;
+	}else{
+		printf("ofxFontStash : can't getBoundingBoxSize() without having been setup first!\n");
+	}
 	return r;
 }
