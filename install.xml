@@ -1,0 +1,35 @@
+<install>
+	<name>ofxFontStash</name>
+    <version>1.0</version>
+    <author><[CDATA[Oriol Ferrer <oriol@uri.cat> ]]></author>
+   
+    <code_url>https://github.com/armadillu/ofxFontStash</code_url>
+    <site_url>http://www.uri.cat</site_url>
+    <download_url>https://github.com/armadillu/ofxFontStash</download_url>
+   
+    <description><![CDATA[
+          Quick and simple Addon wrapping Font-Stash
+    ]]></description>
+    
+	<add>
+		
+		<!-- 	=====================================================================	-->
+		<!--	========================== add per project using this addon =========	-->
+		<!-- 	=====================================================================	-->
+	
+		<src>
+			<folder name="addons/ofxFontStash/src">
+				<file>../../../addons/ofxFontStash/src/ofxFontStash.cpp</file>
+				<file>../../../addons/ofxFontStash/src/ofxFontStash.h</file>
+			</folder>
+			<folder name="addons/ofxFontStash/lib">
+				<file>../../../addons/ofxFontStash/lib/fontstash.c</file>
+				<file>../../../addons/ofxFontStash/lib/fontstash.h</file>
+				<file>../../../addons/ofxFontStash/lib/README.md</file>
+				<file>../../../addons/ofxFontStash/lib/stb_truetype.h</file>
+			</folder>
+		</src>
+		
+	</add>    
+    
+</install>
