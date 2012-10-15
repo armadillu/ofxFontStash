@@ -34,6 +34,7 @@
 #include <iostream>
 #include "ofxFontStash.h"
 
+
 ofxFontStash::ofxFontStash(){
 	stashFontID = 0;
 	lineHeight = 1.0f;

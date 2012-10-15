@@ -61,7 +61,7 @@ void testApp::draw(){
 	ofSetColor(255);
 	font.begin();
 	for (int i = 0; i < 11; i++){
-		font.draw("my line #" + ofToString(i+1), fontSize, x, y + i * fontSize );
+		font.draw("my line #" + ofToString(i+1), fontSize, x, y + i * fontSize, false );
 	}
 	font.end();
 	
