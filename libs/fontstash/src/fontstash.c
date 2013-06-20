@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2011 Andreas Krinke andreas.krinke@gmx.de
+// Copyright (c) 2011-2013 Andreas Krinke andreas.krinke@gmx.de
 // Copyright (c) 2009 Mikko Mononen memon@inside.org
 //
 // This software is provided 'as-is', without any express or implied
@@ -17,51 +17,48 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-
 // Oriol Ferrer Mesià made tiny modifications to make this render text flipped vertically
 // Also changed the include ifdefs
 
-/* 
-#ifdef __MACOSX__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
-*/
+/*
+ #ifdef __MACOSX__
+ #include <OpenGL/gl.h>
+ #else
+ #include <GL/gl.h>
+ #endif
+ */
 
 //oriol replacing platform includes to work better in OpenFrameworks
 //from http://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
 #ifdef _WIN32
-	#include <gl/gl.h>
+#include <gl/gl.h>
 #elif _WIN64
-	#include <gl/gl.h>
+#include <gl/gl.h>
 #elif __APPLE__
-	#include "TargetConditionals.h"
-	#if (TARGET_OS_IPHONE)
-		#import <OpenGLES/ES1/gl.h>
-	#elif (TARGET_IPHONE_SIMULATOR)
-		#import <OpenGLES/ES1/gl.h>
-	#elif (TARGET_OS_MAC)
-		#include <OpenGL/gl.h>
-	#else
-		// Unsupported platform
-	#endif
+#include "TargetConditionals.h"
+#if (TARGET_OS_IPHONE)
+#import <OpenGLES/ES1/gl.h>
+#elif (TARGET_IPHONE_SIMULATOR)
+#import <OpenGLES/ES1/gl.h>
+#elif (TARGET_OS_MAC)
+#include <OpenGL/gl.h>
+#else
+// Unsupported platform
+#endif
 #elif __linux
-	#include <GL/gl.h>
+#include <GL/gl.h>
 #elif __unix // all unices not caught above
-	#include <GL/gl.h>
+#include <GL/gl.h>
 #elif __posix
-	#include <GL/gl.h>
+#include <GL/gl.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
-
-#define STB_TRUETYPE_IMPLEMENTATION
-#define STBTT_malloc(x,u)    malloc(x)
-#define STBTT_free(x,u)      free(x)
+/* @rlyeh: removed STB_TRUETYPE_IMPLENTATION. We link it externally */
 #include "stb_truetype.h"
 
 #define HASH_LUT_SIZE 256
@@ -138,7 +135,9 @@ struct sth_stash
 {
 	int tw,th;
 	float itw,ith;
-	struct sth_texture* textures;
+	GLubyte *empty_data;
+	struct sth_texture* tt_textures;
+	struct sth_texture* bm_textures;
 	struct sth_font* fonts;
 	int drawing;
 };
@@ -172,8 +171,8 @@ static unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned i
 {
 	unsigned int type = utf8d[byte];
 	*codep = (*state != UTF8_ACCEPT) ?
-		(byte & 0x3fu) | (*codep << 6) :
-		(0xff >> type) & (byte);
+    (byte & 0x3fu) | (*codep << 6) :
+    (0xff >> type) & (byte);
 	*state = utf8d[256 + *state*16 + type];
 	return *state;
 }
@@ -183,30 +182,38 @@ static unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned i
 struct sth_stash* sth_create(int cachew, int cacheh)
 {
 	struct sth_stash* stash = NULL;
+	GLubyte* empty_data = NULL;
 	struct sth_texture* texture = NULL;
-
+    
 	// Allocate memory for the font stash.
 	stash = (struct sth_stash*)malloc(sizeof(struct sth_stash));
 	if (stash == NULL) goto error;
 	memset(stash,0,sizeof(struct sth_stash));
-
+    
+	// Create data for clearing the textures
+	empty_data = (GLubyte *)malloc(cachew * cacheh);
+	if (empty_data == NULL) goto error;
+	memset(empty_data, 0, cachew * cacheh);
+    
 	// Allocate memory for the first texture
 	texture = (struct sth_texture*)malloc(sizeof(struct sth_texture));
 	if (texture == NULL) goto error;
 	memset(texture,0,sizeof(struct sth_texture));
-
+    
 	// Create first texture for the cache.
 	stash->tw = cachew;
 	stash->th = cacheh;
 	stash->itw = 1.0f/cachew;
 	stash->ith = 1.0f/cacheh;
-	stash->textures = texture;
+	stash->empty_data = empty_data;
+	stash->tt_textures = texture;
 	glGenTextures(1, &texture->id);
 	if (!texture->id) goto error;
 	glBindTexture(GL_TEXTURE_2D, texture->id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, stash->tw,stash->th, 0, GL_ALPHA, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, cachew, cacheh, 0, GL_ALPHA, GL_UNSIGNED_BYTE, empty_data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
 	return stash;
 	
 error:
@@ -221,16 +228,16 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer)
 {
 	int i, ascent, descent, fh, lineGap;
 	struct sth_font* fnt = NULL;
-
+    
 	fnt = (struct sth_font*)malloc(sizeof(struct sth_font));
 	if (fnt == NULL) goto error;
 	memset(fnt,0,sizeof(struct sth_font));
-
+    
 	// Init hash lookup.
 	for (i = 0; i < HASH_LUT_SIZE; ++i) fnt->lut[i] = -1;
-
+    
 	fnt->data = buffer;
-
+    
 	// Init stb_truetype
 	if (!stbtt_InitFont(&fnt->font, fnt->data, 0)) goto error;
 	
@@ -241,14 +248,14 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer)
 	fnt->ascender = (float)ascent / (float)fh;
 	fnt->descender = (float)descent / (float)fh;
 	fnt->lineh = (float)(fh + lineGap) / (float)fh;
-
+    
 	fnt->idx = idx;
 	fnt->type = TTFONT_MEM;
 	fnt->next = stash->fonts;
 	stash->fonts = fnt;
 	
 	return idx++;
-
+    
 error:
 	if (fnt) {
 		if (fnt->glyphs) free(fnt->glyphs);
@@ -282,7 +289,7 @@ int sth_add_font(struct sth_stash* stash, const char* path)
 		stash->fonts->type = TTFONT_FILE;
 	else
 		free(data);
-
+    
 	return idx;
 	
 error:
@@ -295,49 +302,49 @@ int sth_add_bitmap_font(struct sth_stash* stash, int ascent, int descent, int li
 {
 	int i, fh;
 	struct sth_font* fnt = NULL;
-
+    
 	fnt = (struct sth_font*)malloc(sizeof(struct sth_font));
 	if (fnt == NULL) goto error;
 	memset(fnt,0,sizeof(struct sth_font));
-
+    
 	// Init hash lookup.
 	for (i = 0; i < HASH_LUT_SIZE; ++i) fnt->lut[i] = -1;
-
+    
 	// Store normalized line height. The real line height is got
 	// by multiplying the lineh by font size.
 	fh = ascent - descent;
 	fnt->ascender = (float)ascent / (float)fh;
 	fnt->descender = (float)descent / (float)fh;
 	fnt->lineh = (float)(fh + line_gap) / (float)fh;
-
+    
 	fnt->idx = idx;
 	fnt->type = BMFONT;
 	fnt->next = stash->fonts;
 	stash->fonts = fnt;
 	
 	return idx++;
-
+    
 error:
 	if (fnt) free(fnt);
 	return 0;
 }
 
 void sth_add_glyph(struct sth_stash* stash,
-                  int idx,
-                  GLuint id,
-                  const char* s,
-                  short size, short base,
-                  int x, int y, int w, int h,
-                  float xoffset, float yoffset, float xadvance)
+                   int idx,
+                   GLuint id,
+                   const char* s,
+                   short size, short base,
+                   int x, int y, int w, int h,
+                   float xoffset, float yoffset, float xadvance)
 {
 	struct sth_texture* texture = NULL;
 	struct sth_font* fnt = NULL;
 	struct sth_glyph* glyph = NULL;
 	unsigned int codepoint;
 	unsigned int state = 0;
-
+    
 	if (stash == NULL) return;
-	texture = stash->textures;
+	texture = stash->bm_textures;
 	while (texture != NULL && texture->id != id) texture = texture->next;
 	if (texture == NULL)
 	{
@@ -346,10 +353,10 @@ void sth_add_glyph(struct sth_stash* stash,
 		if (texture == NULL) return;
 		memset(texture, 0, sizeof(struct sth_texture));
 		texture->id = id;
-		texture->next = stash->textures;
-		stash->textures = texture;
+		texture->next = stash->bm_textures;
+		stash->bm_textures = texture;
 	}
-
+    
 	fnt = stash->fonts;
 	while (fnt != NULL && fnt->idx != idx) fnt = fnt->next;
 	if (fnt == NULL) return;
@@ -360,12 +367,12 @@ void sth_add_glyph(struct sth_stash* stash,
 		if (!decutf8(&state, &codepoint, *(unsigned char*)s)) break;
 	}
 	if (state != UTF8_ACCEPT) return;
-
+    
 	// Alloc space for new glyph.
 	fnt->nglyphs++;
-	fnt->glyphs = realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct sth_glyph));
+	fnt->glyphs = (struct sth_glyph *)realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct sth_glyph)); /* @rlyeh: explicit cast needed in C++ */
 	if (!fnt->glyphs) return;
-
+    
 	// Init glyph.
 	glyph = &fnt->glyphs[fnt->nglyphs-1];
 	memset(glyph, 0, sizeof(struct sth_glyph));
@@ -398,7 +405,7 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	float size = isize/10.0f;
 	int rh;
 	struct sth_row* br = NULL;
-
+    
 	// Find code point and size.
 	h = hashint(codepoint) & (HASH_LUT_SIZE-1);
 	i = fnt->lut[h];
@@ -416,19 +423,20 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	// For truetype fonts: create this glyph.
 	scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
 	g = stbtt_FindGlyphIndex(&fnt->font, codepoint);
+	if(!g) return 0; /* @rlyeh: glyph not found, ie, arab chars */
 	stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
 	stbtt_GetGlyphBitmapBox(&fnt->font, g, scale,scale, &x0,&y0,&x1,&y1);
 	gw = x1-x0;
 	gh = y1-y0;
 	
-    // Check if glyph is larger than maximum texture size
+	// Check if glyph is larger than maximum texture size
 	if (gw >= stash->tw || gh >= stash->th)
 		return 0;
-
+    
 	// Find texture and row where the glyph can be fit.
 	br = NULL;
 	rh = (gh+7) & ~7;
-	texture = stash->textures;
+	texture = stash->tt_textures;
 	while(br == NULL)
 	{
 		for (i = 0; i < texture->nrows; ++i)
@@ -436,7 +444,7 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 			if (texture->rows[i].h == rh && texture->rows[i].x+gw+1 <= stash->tw)
 				br = &texture->rows[i];
 		}
-	
+        
 		// If no row is found, there are 3 possibilities:
 		//   - add new row
 		//   - try next texture
@@ -464,8 +472,9 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 						glGenTextures(1, &texture->id);
 						if (!texture->id) goto error;
 						glBindTexture(GL_TEXTURE_2D, texture->id);
-						glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, stash->tw,stash->th, 0, GL_ALPHA, GL_UNSIGNED_BYTE, 0);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, stash->tw,stash->th, 0, GL_ALPHA, GL_UNSIGNED_BYTE, stash->empty_data);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 					}
 					continue;
 				}
@@ -475,15 +484,15 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 			br->x = 0;
 			br->y = py;
 			br->h = rh;
-			texture->nrows++;	
+			texture->nrows++;
 		}
 	}
 	
 	// Alloc space for new glyph.
 	fnt->nglyphs++;
-	fnt->glyphs = realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct sth_glyph));
+	fnt->glyphs = (struct sth_glyph *)realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct sth_glyph)); /* @rlyeh: explicit cast needed in C++ */
 	if (!fnt->glyphs) return 0;
-
+    
 	// Init glyph.
 	glyph = &fnt->glyphs[fnt->nglyphs-1];
 	memset(glyph, 0, sizeof(struct sth_glyph));
@@ -498,14 +507,14 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	glyph->xoff = (float)x0;
 	glyph->yoff = (float)y0;
 	glyph->next = 0;
-
+    
 	// Advance row location.
 	br->x += gw+1;
 	
 	// Insert char to hash lookup.
 	glyph->next = fnt->lut[h];
 	fnt->lut[h] = fnt->nglyphs-1;
-
+    
 	// Rasterize
 	bmp = (unsigned char*)malloc(gw*gh);
 	if (bmp)
@@ -514,12 +523,12 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 		// Update texture
 		glBindTexture(GL_TEXTURE_2D, texture->id);
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, glyph->x0,glyph->y0, gw,gh, GL_ALPHA,GL_UNSIGNED_BYTE,bmp); 
+		glTexSubImage2D(GL_TEXTURE_2D, 0, glyph->x0,glyph->y0, gw,gh, GL_ALPHA,GL_UNSIGNED_BYTE,bmp);
 		free(bmp);
 	}
 	
 	return glyph;
-
+    
 error:
 	if (texture)
 		free(texture);
@@ -530,9 +539,9 @@ static int get_quad(struct sth_stash* stash, struct sth_font* fnt, struct sth_gl
 {
 	int rx,ry;
 	float scale = 1.0f;
-
+    
 	if (fnt->type == BMFONT) scale = isize/(glyph->size*10.0f);
-
+    
 	rx = floorf(*x + scale * glyph->xoff);
 	//ry = floorf(*y - scale * glyph->yoff); //oriol flipped vertically to better match openFrameworks
 	ry = floorf(*y + scale * glyph->yoff);
@@ -564,11 +573,12 @@ static float* setv(float* v, float x, float y, float s, float t)
 
 static void flush_draw(struct sth_stash* stash)
 {
-	struct sth_texture* texture = stash->textures;
+	struct sth_texture* texture = stash->tt_textures;
+	short tt = 1;
 	while (texture)
 	{
 		if (texture->nverts > 0)
-		{			
+		{
 			glBindTexture(GL_TEXTURE_2D, texture->id);
 			glEnable(GL_TEXTURE_2D);
 			glEnableClientState(GL_VERTEX_ARRAY);
@@ -582,6 +592,11 @@ static void flush_draw(struct sth_stash* stash)
 			texture->nverts = 0;
 		}
 		texture = texture->next;
+		if (!texture && tt)
+		{
+			texture = stash->bm_textures;
+			tt = 0;
+		}
 	}
 }
 
@@ -597,25 +612,25 @@ void sth_end_draw(struct sth_stash* stash)
 {
 	if (stash == NULL) return;
 	if (!stash->drawing) return;
-
-/*
-	// Debug dump.
-	if (stash->nverts+6 < VERT_COUNT)
-	{
-		float x = 500, y = 100;
-		float* v = &stash->verts[stash->nverts*4];
-
-		v = setv(v, x, y, 0, 0);
-		v = setv(v, x+stash->tw, y, 1, 0);
-		v = setv(v, x+stash->tw, y+stash->th, 1, 1);
-
-		v = setv(v, x, y, 0, 0);
-		v = setv(v, x+stash->tw, y+stash->th, 1, 1);
-		v = setv(v, x, y+stash->th, 0, 1);
-
-		stash->nverts += 6;
-	}
-*/
+    
+    /*
+     // Debug dump.
+     if (stash->nverts+6 < VERT_COUNT)
+     {
+     float x = 500, y = 100;
+     float* v = &stash->verts[stash->nverts*4];
+     
+     v = setv(v, x, y, 0, 0);
+     v = setv(v, x+stash->tw, y, 1, 0);
+     v = setv(v, x+stash->tw, y+stash->th, 1, 1);
+     
+     v = setv(v, x, y, 0, 0);
+     v = setv(v, x+stash->tw, y+stash->th, 1, 1);
+     v = setv(v, x, y+stash->th, 0, 1);
+     
+     stash->nverts += 6;
+     }
+     */
 	
 	flush_draw(stash);
 	stash->drawing = 0;
@@ -636,8 +651,7 @@ void sth_draw_text(struct sth_stash* stash,
 	struct sth_font* fnt = NULL;
 	
 	if (stash == NULL) return;
-
-	if (!stash->textures) return;
+    
 	fnt = stash->fonts;
 	while(fnt != NULL && fnt->idx != idx) fnt = fnt->next;
 	if (fnt == NULL) return;
@@ -659,7 +673,7 @@ void sth_draw_text(struct sth_stash* stash,
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
 		v = setv(v, q.x1, q.y0, q.s1, q.t0);
 		v = setv(v, q.x1, q.y1, q.s1, q.t1);
-
+        
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
 		v = setv(v, q.x1, q.y1, q.s1, q.t1);
 		v = setv(v, q.x0, q.y1, q.s0, q.t1);
@@ -682,17 +696,15 @@ void sth_dim_text(struct sth_stash* stash,
 	short isize = (short)(size*10.0f);
 	struct sth_font* fnt = NULL;
 	float x = 0, y = 0;
-	
+    
+	*minx = *maxx = *miny = *maxy = 0;	/* @rlyeh: reset vars before failing */
+    
 	if (stash == NULL) return;
-	if (!stash->textures || !stash->textures->id) return;
 	fnt = stash->fonts;
 	while(fnt != NULL && fnt->idx != idx) fnt = fnt->next;
 	if (fnt == NULL) return;
 	if (fnt->type != BMFONT && !fnt->data) return;
 	
-	*minx = *maxx = x;
-	*miny = *maxy = y;
-
 	for (; *s; ++s)
 	{
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
@@ -704,6 +716,7 @@ void sth_dim_text(struct sth_stash* stash,
 		if (q.y1 > *miny) *miny = q.y1; //oriol swapped compare operator to flip text
 		if (q.y0 < *maxy) *maxy = q.y0; //oriol swapped compare operator to flip text
 	}
+	if (floorf(x) > *maxx) *maxx = floorf(x);
 }
 
 void sth_vmetrics(struct sth_stash* stash,
@@ -711,9 +724,8 @@ void sth_vmetrics(struct sth_stash* stash,
 				  float* ascender, float* descender, float* lineh)
 {
 	struct sth_font* fnt = NULL;
-
+    
 	if (stash == NULL) return;
-	if (!stash->textures || !stash->textures->id) return;
 	fnt = stash->fonts;
 	while(fnt != NULL && fnt->idx != idx) fnt = fnt->next;
 	if (fnt == NULL) return;
@@ -732,10 +744,10 @@ void sth_delete(struct sth_stash* stash)
 	struct sth_texture* curtex = NULL;
 	struct sth_font* fnt = NULL;
 	struct sth_font* curfnt = NULL;
-
+    
 	if (!stash) return;
-
-	tex = stash->textures;
+    
+	tex = stash->tt_textures;
 	while(tex != NULL) {
 		curtex = tex;
 		tex = tex->next;
@@ -743,7 +755,16 @@ void sth_delete(struct sth_stash* stash)
 			glDeleteTextures(1, &curtex->id);
 		free(curtex);
 	}
-
+    
+	tex = stash->bm_textures;
+	while(tex != NULL) {
+		curtex = tex;
+		tex = tex->next;
+		if (curtex->id)
+			glDeleteTextures(1, &curtex->id);
+		free(curtex);
+	}
+    
 	fnt = stash->fonts;
 	while(fnt != NULL) {
 		curfnt = fnt;
@@ -754,5 +775,6 @@ void sth_delete(struct sth_stash* stash)
 			free(curfnt->data);
 		free(curfnt);
 	}
+	free(stash->empty_data);
 	free(stash);
 }
