@@ -4,7 +4,7 @@ Quick and simple Addon wrapping [Font-Stash](https://github.com/akrinke/Font-Sta
 
 "Font Stash enables easy string rendering in OpenGL applications. It supports truetype fonts and UTF-8 encoded localized strings. All glyphs are cached in OpenGL texture atlases. Font rasterization is done using Sean Barrett’s stb_truetype.h."
 
-I made tiny modifications to FontStash to render text flipped vertically, to play nicer in the OpenFrameworks universe in general. 
+I made tiny modifications to FontStash to render text flipped vertically, to play nicer in the OpenFrameworks universe in general. It also supports basic multiline text rendering, plus line height.
 
 ofxFontStash is quite [fast](http://www.flickr.com/photos/armadillu/7268071284/in/photostream) at drawing text.
 
