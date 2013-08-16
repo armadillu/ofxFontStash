@@ -31,9 +31,6 @@
  THE SOFTWARE.
  */
 
-
-// TODO: implement getBoundingBoxSize() for text with multiple lines!
-
 #ifndef ofxFontStash_h
 #define ofxFontStash_h
 
@@ -52,30 +49,28 @@ class ofxFontStash{
 		~ofxFontStash();
 	
 		//call this to set your font file (.ttf, etc)
-		bool setup( string fontFile, float lineHeightPercent = 1.0f );
+		bool setup( string fontFile, float lineHeightPercent = 1.0f, int textureDimension = 512);
 			
-		//if automaticBeginEnd == false you will need to manually call begin() and end(). This improves
-		//performance if you want to make several consecutive draw() calls
-		void draw( string text, float size, int x, int y, bool automaticBeginEnd = true );
+		void draw( string text, float size, float x, float y);
+		void drawMultiLine( string text, float size, float x, float y );
 
-		//same as draw, but scans the text for '\n' and starts a new line if found
-		//if automaticBeginEnd == false you will need to manually call begin() and end(). This improves
-		//performance if you want to make several consecutive draw() calls
-		void drawMultiLine( string text, float size, int x, int y, bool automaticBeginEnd = true );
-	
-		//to be used when drawing with automaticBeginEnd == false
-		inline void begin(){ sth_begin_draw(stash);	}
+		//if the text has newlines, it will be treated as if was called into drawMultiLine()
+		ofRectangle getBoundingBoxSize( string text, float size, float x, float y );
 
-		//to be used when drawing with automaticBeginEnd == false
-		inline void end(){ sth_end_draw(stash); }
-	
-		ofRectangle getBoundingBoxSize( string text, float size, int x, int y );
+		//interleave drawBatch* calls between begin() and end()
+		void beginBatch();
+		void drawBatch( string text, float size, float x, float y);
+		void drawMultiLineBatch( string text, float size, float x, float y );
+		void endBatch();
+
+		void setLineHeight(float percent);
 
 	private:
 		
-		float lineHeight;
-		struct sth_stash* stash;
-		int stashFontID;
+		float				lineHeight; // as percent, 1.0 would be normal
+		struct sth_stash*	stash;
+		int					stashFontID;
+		bool				batchDrawing;
 	
 };
 

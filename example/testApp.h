@@ -3,6 +3,19 @@
 #include "ofMain.h"
 #include "ofxFontStash.h"
 
+//comment this line to ignore "ofxTimeMeasurements" calls
+//enabling it requires the ofxTimeMeasurements addon
+//https://github.com/armadillu/ofxTimeMeasurements
+//#define MEASURE_PERFORMANCE
+
+#ifdef MEASURE_PERFORMANCE
+	#include "ofxTimeMeasurements.h"
+#else
+	#define TIME_SAMPLE_START ;
+	#define TIME_SAMPLE_STOP ;
+	#define TIME_SAMPLE_DRAW_BOTTOM_RIGHT() ;
+#endif
+
 class testApp : public ofBaseApp{
 
 	public:
@@ -10,5 +23,7 @@ class testApp : public ofBaseApp{
 		void draw();
 
 		void drawPoint(float x, float y);
+
 		ofxFontStash font;
+		ofxFontStash unicodeFont;
 };
