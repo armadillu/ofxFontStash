@@ -36,9 +36,9 @@
 
 #include "ofMain.h"
 
-//extern "C" {
+extern "C" {
 	#include "fontstash.h"
-//}
+}
 
 
 class ofxFontStash{
