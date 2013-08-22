@@ -34,6 +34,8 @@
 #include <iostream>
 #include "ofxFontStash.h"
 
+#include "Poco/UnicodeConverter.h"
+
 
 ofxFontStash::ofxFontStash(){
 	stashFontID = 0;
@@ -82,6 +84,13 @@ void ofxFontStash::draw( string text, float size, float x, float y){
 	}		
 }
 
+void ofxFontStash::draw(wstring text, float size, float x, float y){
+	string utf8text;
+	Poco::UnicodeConverter::toUTF8(text, utf8text);
+
+	draw(utf8text, size, x, y);
+}
+
 void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	
 	if (stash != NULL){
@@ -105,6 +114,13 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	}else{
 		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");
 	}		
+}
+
+void ofxFontStash::drawMultiLine(wstring text, float size, float x, float y){
+	string utf8text;
+	Poco::UnicodeConverter::toUTF8(text, utf8text);
+
+	drawMultiLine(utf8text, size, x, y);
 }
 
 void ofxFontStash::beginBatch(){
