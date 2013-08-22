@@ -36,9 +36,9 @@
 
 #include "ofMain.h"
 
-extern "C" {
+//extern "C" {
 	#include "fontstash.h"
-}
+//}
 
 
 class ofxFontStash{
@@ -52,7 +52,9 @@ class ofxFontStash{
 		bool setup( string fontFile, float lineHeightPercent = 1.0f, int textureDimension = 512);
 			
 		void draw( string text, float size, float x, float y);
+		void draw( wstring text, float size, float x, float y);
 		void drawMultiLine( string text, float size, float x, float y );
+		void drawMultiLine( wstring text, float size, float x, float y);
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
 		ofRectangle getBoundingBoxSize( string text, float size, float x, float y );
