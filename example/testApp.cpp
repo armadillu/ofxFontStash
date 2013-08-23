@@ -17,8 +17,11 @@ void testApp::setup(){
 void testApp::draw(){
 
 
-	float x = 30 + mouseX * 0.05;
-	float y = 40 + mouseY * 0.05;
+	float lineHeight = ofMap(mouseY, 0, ofGetHeight(), 0, 2, true);
+	unicodeFont.setLineHeight(lineHeight);
+
+	float x = 30;
+	float y = 40;
 	
 	string demoText = "This is my text in BitStream Vera font.";
 	float fontSize = 28;
@@ -41,20 +44,20 @@ void testApp::draw(){
 	
 	ofSetColor(255, 0, 0, 32);
 	TIME_SAMPLE_START("bbox");
-	ofRectangle bbox = font.getBoundingBoxSize( demoText, fontSize, x, y);
+	ofRectangle bbox = font.getBBox( demoText, fontSize, x, y);
 	TIME_SAMPLE_STOP("bbox");
 	ofRect( bbox );
 		
 	
 	// draw multiline text /////////////////////////////////////////////////
 	
-	y += 75;
-	drawPoint(x, y);		//draw insertion point	
+	y += 25 + bbox.height;
+	drawPoint(x, y); //draw insertion point	
 	
 	ofSetColor(255);
 	string s = (string)"ofxFontStash can draw multiline text" + "\n" +
 	"It also supports unicode strings: " + "\n" +
-	"ㄦ润榧 盤毚, إعلان, 藡覶譒, 한국어/조선말, ฉันหิว";
+	"槊監しゅ祟䤂לרפובליקה. אם מיזם 銆銌 憉 圩芰敔 तकनिकल कार्यलय";
 
 	TIME_SAMPLE_START("drawMultiLine");
 	unicodeFont.drawMultiLine( s,  fontSize, x, y);
@@ -63,31 +66,48 @@ void testApp::draw(){
 	// multiline bbox /////////////////////////////////////////////////////
 
 	ofSetColor(0, 255, 0, 32);
-	TIME_SAMPLE_START("bbox MultiLine");
-	ofRectangle bboxMultiline = unicodeFont.getBoundingBoxSize( s, fontSize, x, y);
-	TIME_SAMPLE_STOP("bbox MultiLine");
+	TIME_SAMPLE_START("getBoundingBoxSize");
+	ofRectangle bboxMultiline = unicodeFont.getBBox( s, fontSize, x, y);
+	TIME_SAMPLE_STOP("getBoundingBoxSize");
 	ofRect( bboxMultiline );
+
+
+	// draw multiline column with a fixed width ///////////////////////////
+
+	y += 25 + bboxMultiline.height;
+	drawPoint(x, y); //draw insertion point
+
+	ofSetColor(255);
+	s = "And you can wrap text to a certain (mouseX) width:\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.";
+
+	TIME_SAMPLE_START("drawMultiLineColumn");
+	ofRectangle column = unicodeFont.drawMultiLineColumn( s,  fontSize, x, y, MAX( 200 ,mouseX - x) );
+	TIME_SAMPLE_STOP("drawMultiLineColumn");
+	ofSetColor(255,32);
+	ofRect(column);
+
 
 	// batch drawing, optimized for multiple drawing calls /////////////////
 
-	y += 200;
-	drawPoint(x, y);		//draw insertion point
+	y += column.height + 25;
+	drawPoint(x, y); //draw insertion point
 
 	ofSetColor(255);
 	TIME_SAMPLE_START("drawBatch");
 	font.beginBatch();	//call "begin" before drawing fonts
-	for (int i = 0; i < 10; i++){
-		font.drawBatch("my line #" + ofToString(i+1), fontSize, x, y + i * fontSize );
+	for (int i = 0; i < 5; i++){
+		font.drawBatch("batch mode #" + ofToString(i+1), fontSize, x, y + i * fontSize );
 	}
 	font.endBatch();		//call "end" once finished
 	TIME_SAMPLE_STOP("drawBatch");
 
-	// rotating text /////////////////////////////////////////////////////
+	// rotating text ///////////////////////////////////////////////////////
+	
 	ofPushMatrix();
-		ofTranslate(x + 400, y + 150);
+		ofTranslate(x + 400, y + 50);
 		ofRotate( -200 * ofGetElapsedTimef(), 0, 0, 1);
 		ofSetColor(ofRandom(255), ofRandom(255), ofRandom(255));
-		font.draw("surrealismoooooo!", fontSize, 0, 0 );
+		font.draw("surrealismoooo!", fontSize, 0, 0 );
 		drawPoint(0,0);
 	ofPopMatrix();
 

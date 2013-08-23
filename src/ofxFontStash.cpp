@@ -34,6 +34,18 @@
 #include <iostream>
 #include "ofxFontStash.h"
 
+std::string searchAndReplace(std::string &s,
+							 std::string toReplace,
+							 std::string replaceWith);
+
+std::string searchAndReplace(std::string &s,
+                      std::string toReplace,
+                      std::string replaceWith)
+{
+    return(s.replace(s.find(toReplace), toReplace.length(), replaceWith));
+}
+
+/* *********************************************************************** */
 
 ofxFontStash::ofxFontStash(){
 	stashFontID = 0;
@@ -96,7 +108,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * line, s.c_str(), &dx );
+				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * line, s.c_str(), &dx );
 				line ++;
 			}
 			sth_end_draw(stash);
@@ -105,6 +117,97 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	}else{
 		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");
 	}		
+}
+
+ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x, float y, float maxW, bool dontDraw){
+
+	ofRectangle totalArea = ofRectangle(x,y,0,0);
+	
+	if (stash != NULL){
+
+		glPushMatrix();
+		glTranslatef(x, y, 0.0f);
+		//ofLine(0, 0, maxW, 0);
+
+		//searchAndReplace(text, "\n", " ");
+
+		vector<string>splitLines;
+		ofRectangle r;
+
+		ofUTF8Ptr start = ofUTF8::beginPtr(text);
+		ofUTF8Ptr iter = ofUTF8::beginPtr(text);
+		ofUTF8Ptr lineStart = iter;
+		ofUTF8Ptr lastSpace;
+        ofUTF8Ptr stop = ofUTF8::endPtr(text);
+
+        string thisLine = "";
+		bool foundSpace = false;
+		bool foundNewLine = false;
+        while(iter < stop) {
+
+			ofUniChar c = ofUTF8::getNext(iter); // get the next unichar and iterate
+			if ( ofUnicode::isSpace(c) ){
+				foundSpace = true;
+				lastSpace = iter;
+			}
+			if ( ofTextConverter::toUTF8(c) == "\n" ){
+				foundNewLine = true;
+			}
+            thisLine += ofTextConverter::toUTF8(c);
+			r = getBBox(thisLine.c_str(), size, 0,0);
+			if ( r.width > maxW || foundNewLine ) { //we went too far, lets jump back to our closest space
+				if(foundNewLine){
+					if (thisLine == "\n"){ //if the whole line is only \n, replace for space to avoid weird things
+						thisLine = " ";
+					}else{	//otherwise remove the "\n"
+						thisLine = thisLine.substr(0, thisLine.length()-1);
+					}
+					splitLines.push_back(thisLine);
+					
+				}else{
+					if (foundSpace){
+						//cout << "## foundSpace! (" << thisLine << ")" << endl;
+						string finalLine = walkAndFill(lineStart, iter, lastSpace);
+						splitLines.push_back(finalLine);
+						iter = lastSpace;
+					}else{
+						//cout << "## no Space! (" << thisLine << ")" << endl;
+						splitLines.push_back(thisLine);
+					}
+				}
+				//reset counter vars
+				lineStart = iter;
+				r.width = 0;
+				thisLine = "";
+				foundSpace = foundNewLine = false;
+			}else{
+				if(iter == stop){ //last line!
+					string finalLine = walkAndFill(lineStart, iter, stop);
+					splitLines.push_back(finalLine);
+					break;
+				}
+			}
+        }
+
+
+		if(!dontDraw) beginBatch();
+		for(int i = 0; i < splitLines.size(); i++){
+			float yy = lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * size * i;
+			if(!dontDraw){
+				ofPushMatrix();
+				ofTranslate(0, yy);
+				drawBatch(splitLines[i], size, 0, 0 );
+				ofPopMatrix();
+			}
+			totalArea = totalArea.getUnion( getBBox(splitLines[i], size, x, y + yy));
+		}
+		if(!dontDraw) endBatch();
+		glPopMatrix();
+
+	}else{
+		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");
+	}
+	return totalArea;
 }
 
 void ofxFontStash::beginBatch(){
@@ -147,7 +250,7 @@ void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * line, s.c_str(), &dx );
+				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * line, s.c_str(), &dx );
 				line ++;
 			}
 		}else{
@@ -159,8 +262,20 @@ void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y
 
 }
 
+string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
 
-ofRectangle ofxFontStash::getBoundingBoxSize( string text, float size, float xx, float yy ){
+	string finalLine = "";
+	ofUTF8Ptr i = begin;
+	while (i < iter) { // re-fill the finalLine from the begining to the last Space
+		finalLine += ofTextConverter::toUTF8(ofUTF8::getNext(i)); // get the next unichar and iterate
+		if(i == end){
+			break;
+		}
+	}
+	return finalLine;
+}
+
+ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy ){
 
 	ofRectangle r;
 
@@ -182,7 +297,7 @@ ofRectangle ofxFontStash::getBoundingBoxSize( string text, float size, float xx,
 			if(h > r.height) r.height = h;
 			ofRectangle r2 = r;
 			r2.y -= r2.height;
-			r2.y += size * lineHeight * line;
+			r2.y += size * lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * line;
 			rects.push_back(r2);
 			//ofSetColor(255,32); //debug
 			//ofRect(r2);

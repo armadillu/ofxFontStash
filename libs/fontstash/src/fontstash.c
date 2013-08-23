@@ -32,7 +32,9 @@
 //oriol replacing platform includes to work better in OpenFrameworks
 //from http://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
 #ifdef _WIN32
-#include <gl/gl.h>
+	//#include <gl/gl.h> //oriol making it work for win32
+	#include "GL\glew.h"
+	#include "GL\wglew.h"
 #elif _WIN64
 #include <gl/gl.h>
 #elif __APPLE__
@@ -73,6 +75,11 @@
 #define BMFONT      3
 
 static int idx = 1;
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static unsigned int hashint(unsigned int a)
 {
@@ -193,7 +200,7 @@ struct sth_stash* sth_create(int cachew, int cacheh)
 	memset(stash,0,sizeof(struct sth_stash));
 
 	// Create data for clearing the textures
-	empty_data = malloc(cachew * cacheh);
+	empty_data = (GLubyte*)	malloc(cachew * cacheh);
 	if (empty_data == NULL) goto error;
 	memset(empty_data, 0, cachew * cacheh);
 
@@ -471,6 +478,14 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 						texture = texture->next;
 						if (texture == NULL) goto error;
 						memset(texture,0,sizeof(struct sth_texture));
+						//oriol counting how many we have created so far!
+						int numTex = 1;
+						struct sth_texture* tex = stash->tt_textures;
+						while (tex->next != NULL) {
+							numTex++;
+							tex = tex->next;
+						}
+						printf("fontStash allocating a new texture of %d x %d (%d used so far)\n", stash->tw,stash->th, numTex );
 						glGenTextures(1, &texture->id);
 						if (!texture->id) goto error;
 						glBindTexture(GL_TEXTURE_2D, texture->id);
@@ -782,3 +797,8 @@ void sth_delete(struct sth_stash* stash)
 	free(stash->empty_data);
 	free(stash);
 }
+
+
+#ifdef __cplusplus
+}
+#endif

@@ -34,7 +34,11 @@
 #ifndef ofxFontStash_h
 #define ofxFontStash_h
 
+#define OFX_FONT_STASHLINE_HEIGHT_MULT	0.8
+
 #include "ofMain.h"
+#include "ofUTF8.h"
+#include "ofTextConverter.h"
 
 extern "C" {
 	#include "fontstash.h"
@@ -50,12 +54,21 @@ class ofxFontStash{
 	
 		//call this to set your font file (.ttf, etc)
 		bool setup( string fontFile, float lineHeightPercent = 1.0f, int textureDimension = 512);
-			
+
+		//will draw text in one line, ignoring "\n"'s
 		void draw( string text, float size, float x, float y);
-		void drawMultiLine( string text, float size, float x, float y );
+
+		//text with "\n" will produce line breaks
+		void drawMultiLine( string text, float fontSize, float x, float y );
+
+		//fits text in a column of a certain width
+		//if you only want to find out the bbox size, send in dontDraw=true
+		ofRectangle drawMultiLineColumn( string text, float fontSize, float x, float y, float columnWidth, bool dontDraw = false );
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
-		ofRectangle getBoundingBoxSize( string text, float size, float x, float y );
+		ofRectangle getBBox( string text, float size, float x, float y );
+		ofRectangle getBBox( string text, float size, float x, float y, float columnWidth );
+
 
 		//interleave drawBatch* calls between begin() and end()
 		void beginBatch();
@@ -71,7 +84,9 @@ class ofxFontStash{
 		struct sth_stash*	stash;
 		int					stashFontID;
 		bool				batchDrawing;
-	
+
+		//fill in a string
+		string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
 };
 
 
