@@ -6,7 +6,7 @@ Quick and simple Addon wrapping [Font-Stash](https://github.com/akrinke/Font-Sta
 
 I made tiny modifications to FontStash to render text flipped vertically, to play nicer in the OpenFrameworks universe in general. It will also report every time a new texture is created.
 
-ofxFontStash supports basic one-line text drawing, lineHeight, multiline text rendering based on '\n', and also word wraping to draw a paragraph constrained to a certain width. It also offers bbox calculations on all the drawing options.
+ofxFontStash supports basic one-line text drawing, lineHeight, multiline text rendering based on '\n', and also word wraping to draw a paragraph constrained to a certain width. It also offers bbox calculations on all the drawing options. It requires [ofxUnicode](http://github.com/bakercp/ofxUnicode).
 
 ofxFontStash is quite [fast](http://www.flickr.com/photos/armadillu/7268071284/sizes/o/in/photostream/) at drawing text. If you need to draw a left-aligned text column of a certain width, ofxFontStash can be [~10x faster](http://www.flickr.com/photos/armadillu/9574047566/sizes/o/in/photostream/) than ofxFTGL.
 
