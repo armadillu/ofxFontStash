@@ -119,17 +119,18 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	}		
 }
 
-ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x, float y, float maxW, bool dontDraw){
+ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x, float y, float maxW, int &numLines, bool dontDraw){
 
 	ofRectangle totalArea = ofRectangle(x,y,0,0);
 	
 	if (stash != NULL){
 
-		glPushMatrix();
-		glTranslatef(x, y, 0.0f);
+		numLines = 0;
+		if(!dontDraw){
+			glPushMatrix();
+			glTranslatef(x, y, 0.0f);
+		}
 		//ofLine(0, 0, maxW, 0);
-
-		//searchAndReplace(text, "\n", " ");
 
 		vector<string>splitLines;
 		ofRectangle r;
@@ -157,7 +158,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 			r = getBBox(thisLine.c_str(), size, 0,0);
 			if ( r.width > maxW || foundNewLine ) { //we went too far, lets jump back to our closest space
 				if(foundNewLine){
-					if (thisLine == "\n"){ //if the whole line is only \n, replace for space to avoid weird things
+					if (thisLine == "\n"){ //if the whole line is only \n, replace with a space to avoid weird things
 						thisLine = " ";
 					}else{	//otherwise remove the "\n"
 						thisLine = thisLine.substr(0, thisLine.length()-1);
@@ -205,8 +206,11 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 			totalArea = getBBox(splitLines[i], size, x, y + yy); //TODO!
 			#endif
 		}
-		if(!dontDraw) endBatch();
-		glPopMatrix();
+		if(!dontDraw){
+			endBatch();
+			glPopMatrix();
+		}
+		numLines = splitLines.size();
 
 	}else{
 		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");
