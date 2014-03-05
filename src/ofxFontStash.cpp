@@ -199,7 +199,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 				drawBatch(splitLines[i], size, 0, 0 );
 				ofPopMatrix();
 			}
-			#if OF_VERSION >= 7 && OF_VERSION_MINOR > 0
+			#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
 			totalArea = totalArea.getUnion( getBBox(splitLines[i], size, x, y + yy));
 			#else
 			totalArea = getBBox(splitLines[i], size, x, y + yy); //TODO!
@@ -311,7 +311,7 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		if(line > 1){ //if multiline
 			r.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
-				#if OF_VERSION >= 7 && OF_VERSION_MINOR > 0
+				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
 				r = r.getUnion(rects[i]);	//TODO
 				#endif
 			}

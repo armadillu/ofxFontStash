@@ -10,12 +10,12 @@ void testApp::setup(){
 
 	font.setup("Vera.ttf"); //load verdana font, set lineHeight to be 130%
 	unicodeFont.setup("Arial Unicode.ttf"); //load verdana font, set lineHeight to be 130%
+
 }
 
 
 //--------------------------------------------------------------
 void testApp::draw(){
-
 
 	float lineHeight = ofMap(mouseY, 0, ofGetHeight(), 0, 2, true);
 	unicodeFont.setLineHeight(lineHeight);
@@ -112,7 +112,6 @@ void testApp::draw(){
 	ofPopMatrix();
 
 	ofSetColor(255);
-	TIME_SAMPLE_DRAW_BOTTOM_RIGHT();
 }
 
 void testApp::drawPoint(float x, float y){
