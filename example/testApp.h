@@ -13,7 +13,6 @@
 #else
 	#define TIME_SAMPLE_START ;
 	#define TIME_SAMPLE_STOP ;
-	#define TIME_SAMPLE_DRAW_BOTTOM_RIGHT() ;
 #endif
 
 class testApp : public ofBaseApp{

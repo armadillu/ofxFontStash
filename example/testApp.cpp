@@ -114,6 +114,7 @@ void testApp::draw(){
 	ofSetColor(255);
 }
 
+
 void testApp::drawPoint(float x, float y){
 	ofSetColor(0, 255, 0, 128);	
 	ofCircle(x, y, 2);
