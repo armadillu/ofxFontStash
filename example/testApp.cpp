@@ -81,7 +81,8 @@ void testApp::draw(){
 	s = "And you can wrap text to a certain (mouseX) width:\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.";
 
 	TIME_SAMPLE_START("drawMultiLineColumn");
-	ofRectangle column = unicodeFont.drawMultiLineColumn( s,  fontSize, x, y, MAX( 200 ,mouseX - x) );
+	int numLines = 0;
+	ofRectangle column = unicodeFont.drawMultiLineColumn( s,  fontSize, x, y, MAX( 200 ,mouseX - x), numLines );
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
 	ofSetColor(255,32);
 	ofRect(column);
