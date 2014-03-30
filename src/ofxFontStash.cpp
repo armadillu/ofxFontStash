@@ -119,7 +119,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	}		
 }
 
-ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x, float y, float maxW, int &numLines, bool dontDraw){
+ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x, float y, float maxW, int &numLines, bool dontDraw, int maxLines){
 
 	ofRectangle totalArea = ofRectangle(x,y,0,0);
 	
@@ -192,7 +192,11 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 
 
 		if(!dontDraw) beginBatch();
-		for(int i = 0; i < splitLines.size(); i++){
+		numLines = splitLines.size();
+		if (maxLines > 0 ){
+			numLines = MIN(splitLines.size(), maxLines);
+		}
+		for(int i = 0; i < numLines; i++){
 			float yy = lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * size * i;
 			if(!dontDraw){
 				ofPushMatrix();
@@ -210,7 +214,6 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 			endBatch();
 			glPopMatrix();
 		}
-		numLines = splitLines.size();
 
 	}else{
 		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");

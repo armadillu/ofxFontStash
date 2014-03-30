@@ -64,7 +64,7 @@ class ofxFontStash{
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
 		//numLines will return the number of lines this has been split in
-		ofRectangle drawMultiLineColumn( string text, float fontSize, float x, float y, float columnWidth, int &numLines, bool dontDraw = false );
+		ofRectangle drawMultiLineColumn( string text, float fontSize, float x, float y, float columnWidth, int &numLines, bool dontDraw = false, int maxLines = 0 );
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
 		ofRectangle getBBox( string text, float size, float x, float y );

@@ -82,7 +82,14 @@ void testApp::draw(){
 
 	TIME_SAMPLE_START("drawMultiLineColumn");
 	int numLines = 0;
-	ofRectangle column = unicodeFont.drawMultiLineColumn( s,  fontSize, x, y, MAX( 200 ,mouseX - x), numLines );
+	ofRectangle column = unicodeFont.drawMultiLineColumn(	s,			/*string*/
+															fontSize,	/*size*/
+															x, y,		/*where*/
+															MAX( 200 ,mouseX - x), /*column width*/
+															numLines,	/*get back the number of lines*/
+															false,		/*if true, we wont draw (just get bbox back)*/
+															5			/* max number of lines to draw, crop after that */
+														 );
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
 	ofSetColor(255,32);
 	ofRect(column);
