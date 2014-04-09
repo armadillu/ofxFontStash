@@ -135,7 +135,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 		vector<string>splitLines;
 		ofRectangle r;
 
-		ofUTF8Ptr start = ofUTF8::beginPtr(text);
+		//ofUTF8Ptr start = ofUTF8::beginPtr(text);
 		ofUTF8Ptr iter = ofUTF8::beginPtr(text);
 		ofUTF8Ptr lineStart = iter;
 		ofUTF8Ptr lastSpace;
