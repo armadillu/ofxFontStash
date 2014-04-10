@@ -108,7 +108,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * line, s.c_str(), &dx );
+				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
 				line ++;
 			}
 			sth_end_draw(stash);
@@ -197,7 +197,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 			numLines = MIN(splitLines.size(), maxLines);
 		}
 		for(int i = 0; i < numLines; i++){
-			float yy = lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * size * i;
+			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
 			if(!dontDraw){
 				ofPushMatrix();
 				ofTranslate(0, yy);
@@ -270,7 +270,7 @@ void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * line, s.c_str(), &dx );
+				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
 				line ++;
 			}
 		}else{
@@ -317,7 +317,7 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 			if(h > r.height) r.height = h;
 			ofRectangle r2 = r;
 			r2.y -= r2.height;
-			r2.y += size * lineHeight * OFX_FONT_STASHLINE_HEIGHT_MULT * line;
+			r2.y += size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line;
 			rects.push_back(r2);
 			//ofSetColor(255,32); //debug
 			//ofRect(r2);

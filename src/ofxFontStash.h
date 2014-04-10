@@ -34,7 +34,7 @@
 #ifndef ofxFontStash_h
 #define ofxFontStash_h
 
-#define OFX_FONT_STASHLINE_HEIGHT_MULT	0.8
+#define OFX_FONT_STASH_LINE_HEIGHT_MULT	0.8
 
 #include "ofMain.h"
 #include "ofUTF8.h"
