@@ -119,7 +119,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	}		
 }
 
-ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x, float y, float maxW, int &numLines, bool dontDraw, int maxLines){
+ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float x, float y, float maxW, int &numLines, bool dontDraw, int maxLines, bool giveBackNewLinedText){
 
 	ofRectangle totalArea = ofRectangle(x,y,0,0);
 	
@@ -213,6 +213,15 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string text, float size, float x,
 		if(!dontDraw){
 			endBatch();
 			glPopMatrix();
+		}
+
+		//return through reference the edited text (with newLines!)
+		if(giveBackNewLinedText){
+			text = "";
+			for (int i = 0; i < numLines; i++){
+				text += splitLines[i];
+				if (i != numLines-1) text += "\n";
+			}
 		}
 
 	}else{
