@@ -66,13 +66,13 @@ bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDime
 		stash = sth_create(texDimension,texDimension);
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
-			printf("ofxFontStash : loaded font %s in texture (%d x %d)\n", fontFile.c_str(), texDimension, texDimension );
+			ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
 			return true;
 		}else{
-			printf("ofxFontStash : Can't load font! %s\n", fontFile.c_str() );
+			ofLogError("ofxFontStash", "Can't load font! '%s'", fontFile.c_str() );
 		}
 	}else{
-		printf("ofxFontStash : don't call setup() more than once! %s\n", fontFile.c_str() );
+		ofLogError("ofxFontStash", "don't call setup() more than once! %s", fontFile.c_str() );
 	}
 	return false;
 }
@@ -90,7 +90,7 @@ void ofxFontStash::draw( string text, float size, float x, float y){
 		sth_end_draw(stash); // this actually draws
 		glPopMatrix();
 	}else{
-		printf("ofxFontStash : can't draw() without having been setup first!\n");
+		ofLogError("ofxFontStash", "can't draw() without having been setup first!");
 	}		
 }
 
@@ -115,7 +115,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 		glPopMatrix();
 
 	}else{
-		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");
+		ofLogError("ofxFontStash", "can't drawMultiLine() without having been setup first!");
 	}		
 }
 
@@ -225,7 +225,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		}
 
 	}else{
-		printf("ofxFontStash : can't drawMultiLine() without having been setup first!\n");
+		ofLogError("ofxFontStash", "can't drawMultiLine() without having been setup first!");
 	}
 	return totalArea;
 }
@@ -252,10 +252,10 @@ void ofxFontStash::drawBatch( string text, float size, float x, float y){
 			sth_draw_text( stash, stashFontID, size, x, y, text.c_str(), &dx ); //this might draw
 			sth_end_draw(stash); // this actually draws
 		}else{
-			printf("ofxFontStash : can't drawBatch() without calling beginBatch() first!\n");
+			ofLogError("ofxFontStash", "can't drawBatch() without calling beginBatch() first!");
 		}
 	}else{
-		printf("ofxFontStash : can't drawBatch() without having been setup first!\n");
+		ofLogError("ofxFontStash", "can't drawBatch() without having been setup first!");
 	}
 }
 
@@ -274,10 +274,10 @@ void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y
 				line ++;
 			}
 		}else{
-			printf("ofxFontStash : can't drawMultiLineBatch() without calling beginBatch() first!\n");
+			ofLogError("ofxFontStash", "can't drawMultiLineBatch() without calling beginBatch() first!");
 		}
 	}else{
-		printf("ofxFontStash : can't drawMultiLineBatch() without having been setup first!\n");
+		ofLogError("ofxFontStash", "can't drawMultiLineBatch() without having been setup first!");
 	}
 
 }
@@ -336,7 +336,7 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		}
 
 	}else{
-		printf("ofxFontStash : can't getBoundingBoxSize() without having been setup first!\n");
+		ofLogError("ofxFontStash", "can't getBoundingBoxSize() without having been setup first!");
 	}
 	return r;
 }
