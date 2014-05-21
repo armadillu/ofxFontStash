@@ -190,12 +190,24 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 			}
         }
 
+		//remove leading white spaces if soemhow they fell through
+		for(int i = 0; i < splitLines.size(); i++){
+			string clean = splitLines[i];
+			ofUTF8Ptr iter = ofUTF8::beginPtr(clean);
+			ofUniChar c = ofUTF8::getNext(iter); // get the next unichar and iterate
+			if (ofTextConverter::toUTF8(c)  == " "){
+				clean = clean.substr(1, clean.size() - 1);
+				splitLines[i] = clean;
+			}
+		}
+
 
 		if(!dontDraw) beginBatch();
 		numLines = splitLines.size();
 		if (maxLines > 0 ){
 			numLines = MIN(splitLines.size(), maxLines);
 		}
+
 		for(int i = 0; i < numLines; i++){
 			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
 			if(!dontDraw){
