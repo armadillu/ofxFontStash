@@ -79,19 +79,27 @@ void testApp::draw(){
 
 	ofSetColor(255);
 	s = "And you can wrap text to a certain (mouseX) width:\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.";
+	//s = "international bananas";
 
 	TIME_SAMPLE_START("drawMultiLineColumn");
 	int numLines = 0;
+	bool wordsWereCropped;
 	ofRectangle column = unicodeFont.drawMultiLineColumn(	s,			/*string*/
 															fontSize,	/*size*/
 															x, y,		/*where*/
-															MAX( 200 ,mouseX - x), /*column width*/
+															MAX( 10 ,mouseX - x), /*column width*/
 															numLines,	/*get back the number of lines*/
 															false,		/*if true, we wont draw (just get bbox back)*/
-															5			/* max number of lines to draw, crop after that */
+															5,			/* max number of lines to draw, crop after that */
+															true,	/*get the final formatting with added \n's*/
+															&wordsWereCropped
 														 );
+	cout << "##############" << endl;
+	cout << s << endl;
+	cout << "##############" << endl;
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
-	ofSetColor(255,32);
+	if(!wordsWereCropped) ofSetColor(255,32);
+	else ofSetColor(255,((ofGetFrameNum()%4 <= 1) ? 0:32));
 	ofRect(column);
 
 

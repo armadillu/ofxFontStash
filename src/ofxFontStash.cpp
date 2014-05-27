@@ -119,10 +119,16 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	}		
 }
 
-ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float x, float y, float maxW, int &numLines, bool dontDraw, int maxLines, bool giveBackNewLinedText){
+ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float x, float y,
+											  float maxW, int &numLines, bool dontDraw, int maxLines,
+											  bool giveBackNewLinedText, bool* wordsWereTruncated){
 
 	ofRectangle totalArea = ofRectangle(x,y,0,0);
-	
+
+	if(wordsWereTruncated){
+		*wordsWereTruncated = false;
+	}
+
 	if (stash != NULL){
 
 		numLines = 0;
@@ -174,6 +180,9 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 					}else{
 						//cout << "## no Space! (" << thisLine << ")" << endl;
 						splitLines.push_back(thisLine);
+						if(wordsWereTruncated){
+							*wordsWereTruncated = true;
+						}
 					}
 				}
 				//reset counter vars
@@ -190,25 +199,15 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 			}
         }
 
-		//remove leading white spaces if soemhow they fell through
-		for(int i = 0; i < splitLines.size(); i++){
-			string clean = splitLines[i];
-			ofUTF8Ptr iter = ofUTF8::beginPtr(clean);
-			ofUniChar c = ofUTF8::getNext(iter); // get the next unichar and iterate
-			if (ofTextConverter::toUTF8(c)  == " "){
-				clean = clean.substr(1, clean.size() - 1);
-				splitLines[i] = clean;
-			}
-		}
-
-
 		if(!dontDraw) beginBatch();
 		numLines = splitLines.size();
+		int linesToDraw;
 		if (maxLines > 0 ){
-			numLines = MIN(splitLines.size(), maxLines);
+			linesToDraw = MIN(splitLines.size(), maxLines);
+			numLines = splitLines.size();
 		}
 
-		for(int i = 0; i < numLines; i++){
+		for(int i = 0; i < linesToDraw; i++){
 			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
 			if(!dontDraw){
 				ofPushMatrix();
