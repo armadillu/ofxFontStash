@@ -74,6 +74,10 @@
 #define TTFONT_MEM  2
 #define BMFONT      3
 
+float PADDING = 4;
+
+#define MIPMAPS			1
+
 static int idx = 1;
 
 
@@ -220,8 +224,16 @@ struct sth_stash* sth_create(int cachew, int cacheh)
 	if (!texture->id) goto error;
 	glBindTexture(GL_TEXTURE_2D, texture->id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, cachew, cacheh, 0, GL_ALPHA, GL_UNSIGNED_BYTE, empty_data);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	if(MIPMAPS)glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	else glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if(MIPMAPS){
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); //TODO check for hw support!
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
+	}
+
+	//glGenerateMipmap(GL_TEXTURE_2D);
 
 	return stash;
 	
@@ -435,8 +447,10 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	if(!g) return 0; /* @rlyeh: glyph not found, ie, arab chars */
 	stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
 	stbtt_GetGlyphBitmapBox(&fnt->font, g, scale,scale, &x0,&y0,&x1,&y1);
-	gw = x1-x0;
-	gh = y1-y0;
+
+
+	gw = x1-x0 + PADDING;
+	gh = y1-y0 + PADDING;
 	
 	// Check if glyph is larger than maximum texture size
 	if (gw >= stash->tw || gh >= stash->th)
@@ -490,8 +504,12 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 						if (!texture->id) goto error;
 						glBindTexture(GL_TEXTURE_2D, texture->id);
 						glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, stash->tw,stash->th, 0, GL_ALPHA, GL_UNSIGNED_BYTE, stash->empty_data);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+						if(MIPMAPS)glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+						else glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+						//glGenerateMipmap(GL_TEXTURE_2D);
 					}
 					continue;
 				}
@@ -543,6 +561,9 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	//oriol trying to get rid of halos when rotating font
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	//
 		glTexSubImage2D(GL_TEXTURE_2D, 0, glyph->x0,glyph->y0, gw,gh, GL_ALPHA,GL_UNSIGNED_BYTE,bmp);
+		if(MIPMAPS){
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
 		free(bmp);
 	}
 	
@@ -688,14 +709,16 @@ void sth_draw_text(struct sth_stash* stash,
 		if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
 		
 		v = &texture->verts[texture->nverts*4];
-		
+
+		int p = PADDING;
+		float tw = PADDING / (float)stash->tw;
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
-		v = setv(v, q.x1, q.y0, q.s1, q.t0);
-		v = setv(v, q.x1, q.y1, q.s1, q.t1);
+		v = setv(v, q.x1 - p, q.y0, q.s1 - tw, q.t0);
+		v = setv(v, q.x1 - p, q.y1 - p, q.s1 - tw, q.t1 - tw);
 
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
-		v = setv(v, q.x1, q.y1, q.s1, q.t1);
-		v = setv(v, q.x0, q.y1, q.s0, q.t1);
+		v = setv(v, q.x1 - p, q.y1 - p, q.s1 - tw, q.t1 - tw);
+		v = setv(v, q.x0, q.y1 - p, q.s0, q.t1 - tw);
 		
 		texture->nverts += 6;
 	}

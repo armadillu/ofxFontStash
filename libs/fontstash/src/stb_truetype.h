@@ -290,9 +290,9 @@ unsigned char screen[20][79];
 int main(int arg, char **argv)
 {
    stbtt_fontinfo font;
-   int i,j,ascent,baseline,ch=0;
-   float scale, xpos=0;
-   char *text = "Heljo World!";
+	int i,j,ascent,baseline,ch=0;
+	float scale, xpos=2;  // leave a little padding in case the character extends left
+	char *text = "Heljo World!";
 
    fread(buffer, 1, 1000000, fopen("c:/windows/fonts/arialbd.ttf", "rb"));
    stbtt_InitFont(&font, buffer, 0);
@@ -1760,7 +1760,8 @@ unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info, float sc
       scale_y = scale_x;
    }
 
-   stbtt_GetGlyphBitmapBox(info, glyph, scale_x, scale_y, &ix0,&iy0,&ix1,&iy1);
+   //stbtt_GetGlyphBitmapBox(info, glyph, scale_x, scale_y, &ix0,&iy0,&ix1,&iy1);
+	stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0,&iy0,&ix1,&iy1);
 
    // now we get the size
    gbm.w = (ix1 - ix0);
