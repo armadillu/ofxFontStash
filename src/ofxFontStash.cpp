@@ -58,12 +58,12 @@ ofxFontStash::~ofxFontStash(){
 	if(stash != NULL) sth_delete(stash);
 }
 
-bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/){
+bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/, bool createMipMaps, int intraCharPadding){
 	
 	if (stash == NULL){
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(texDimension);
-		stash = sth_create(texDimension,texDimension);
+		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding);
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
 			ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );

@@ -21,7 +21,7 @@
 #define FONTSTASH_H
 
 
-struct sth_stash* sth_create(int cachew, int cacheh);
+struct sth_stash* sth_create(int cachew, int cacheh, _Bool createMipmaps, int charPadding);
 
 int sth_add_font(struct sth_stash* stash, const char* path);
 int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer);

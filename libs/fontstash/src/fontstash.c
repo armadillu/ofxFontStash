@@ -74,8 +74,6 @@
 #define TTFONT_MEM  2
 #define BMFONT      3
 
-float PADDING = 4;
-
 #define MIPMAPS			1
 
 static int idx = 1;
@@ -153,6 +151,8 @@ struct sth_stash
 	struct sth_texture* bm_textures;
 	struct sth_font* fonts;
 	int drawing;
+	int padding; //oriol adding texture padding around chars to avoud mipmap leaks
+	_Bool hasMipMap; //oriol adding optional mipmap generation to each char
 };
 
 
@@ -192,7 +192,7 @@ static unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned i
 
 
 
-struct sth_stash* sth_create(int cachew, int cacheh)
+struct sth_stash* sth_create(int cachew, int cacheh, _Bool createMipmaps, int charPadding)
 {
 	struct sth_stash* stash = NULL;
 	GLubyte* empty_data = NULL;
@@ -224,16 +224,11 @@ struct sth_stash* sth_create(int cachew, int cacheh)
 	if (!texture->id) goto error;
 	glBindTexture(GL_TEXTURE_2D, texture->id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, cachew, cacheh, 0, GL_ALPHA, GL_UNSIGNED_BYTE, empty_data);
-	if(MIPMAPS)glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	else glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if(MIPMAPS){
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); //TODO check for hw support!
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
-	}
 
-	//glGenerateMipmap(GL_TEXTURE_2D);
+	stash->hasMipMap = createMipmaps;
+	stash->padding = charPadding;
 
 	return stash;
 	
@@ -258,6 +253,7 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer)
 	for (i = 0; i < HASH_LUT_SIZE; ++i) fnt->lut[i] = -1;
 
 	fnt->data = buffer;
+
 
 	// Init stb_truetype
 	if (!stbtt_InitFont(&fnt->font, fnt->data, 0)) goto error;
@@ -449,8 +445,8 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	stbtt_GetGlyphBitmapBox(&fnt->font, g, scale,scale, &x0,&y0,&x1,&y1);
 
 
-	gw = x1-x0 + PADDING;
-	gh = y1-y0 + PADDING;
+	gw = x1-x0 + stash->padding;
+	gh = y1-y0 + stash->padding;
 	
 	// Check if glyph is larger than maximum texture size
 	if (gw >= stash->tw || gh >= stash->th)
@@ -504,9 +500,7 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 						if (!texture->id) goto error;
 						glBindTexture(GL_TEXTURE_2D, texture->id);
 						glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, stash->tw,stash->th, 0, GL_ALPHA, GL_UNSIGNED_BYTE, stash->empty_data);
-
-						if(MIPMAPS)glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-						else glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 						//glGenerateMipmap(GL_TEXTURE_2D);
@@ -561,7 +555,11 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	//oriol trying to get rid of halos when rotating font
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	//
 		glTexSubImage2D(GL_TEXTURE_2D, 0, glyph->x0,glyph->y0, gw,gh, GL_ALPHA,GL_UNSIGNED_BYTE,bmp);
-		if(MIPMAPS){
+		if(stash->hasMipMap){
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); //TODO check for hw support!
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		free(bmp);
@@ -710,8 +708,8 @@ void sth_draw_text(struct sth_stash* stash,
 		
 		v = &texture->verts[texture->nverts*4];
 
-		int p = PADDING;
-		float tw = PADDING / (float)stash->tw;
+		int p = stash->padding;
+		float tw = stash->padding / (float)stash->tw;
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
 		v = setv(v, q.x1 - p, q.y0, q.s1 - tw, q.t0);
 		v = setv(v, q.x1 - p, q.y1 - p, q.s1 - tw, q.t1 - tw);

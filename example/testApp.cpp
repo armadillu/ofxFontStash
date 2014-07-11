@@ -8,8 +8,13 @@ void testApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(22, 22, 22, 255);
 
-	font.setup("Vera.ttf"); //load verdana font, set lineHeight to be 130%
-	unicodeFont.setup("Arial Unicode.ttf"); //load verdana font, set lineHeight to be 130%
+	font.setup("Vera.ttf");
+	unicodeFont.setup("Arial Unicode.ttf", //font file, ttf only
+					  1.0,					//lineheight percent
+					  1024,					//texture atlas dimension
+					  true,					//create mipmaps of the font, useful to scale down the font at smaller sizes
+					  8						//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+					  );					//lower res mipmaps wil bleed into each other
 
 }
 
@@ -127,7 +132,25 @@ void testApp::draw(){
 		drawPoint(0,0);
 	ofPopMatrix();
 
+	// scaling text with mipmaps ///////////////////////////////////////////////////////
+
+	ofPushMatrix();
+	ofTranslate(600, 40);
+	float scale = mouseY /(float) ofGetHeight();
+	ofPushMatrix();
+	ofScale(scale, scale);
 	ofSetColor(255);
+	unicodeFont.draw("MIPMAPS :)", fontSize * 2, 0, 0 );
+	drawPoint(0,0);
+	ofPopMatrix();
+
+	ofTranslate(0, 30);
+	ofScale(scale, scale);
+	font.draw("NO MIPMAPS :(", fontSize * 2, 0, 0 );
+	drawPoint(0,0);
+	ofPopMatrix();
+
+
 }
 
 

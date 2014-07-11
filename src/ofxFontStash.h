@@ -53,7 +53,17 @@ class ofxFontStash{
 		~ofxFontStash();
 	
 		//call this to set your font file (.ttf, etc)
-		bool setup( string fontFile, float lineHeightPercent = 1.0f, int textureDimension = 512);
+		bool setup( string fontFile,
+				   float lineHeightPercent = 1.0f,
+				   int textureDimension = 512,	//texture atlas size, must be PowerOfTwo (512, 1024, 2048, etc)
+				   bool createMipMaps = false,	//create mipmaps for the texture atlasas; if you do
+												//you will need some extra padding between the characters
+												//in the altases, otherwise the mipmaps will leak when
+												//using smaller sizes, and characters will have white
+												//outlines around them
+				   int intraCharPadding = 0	//padding around each character in the texture atlas;
+												//wastes texture space, but makes mipmaps work.
+				   );
 
 		//will draw text in one line, ignoring "\n"'s
 		void draw( string text, float size, float x, float y);
