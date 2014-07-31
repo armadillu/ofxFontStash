@@ -243,14 +243,14 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 
 void ofxFontStash::beginBatch(){
 	if(stash != NULL){
-		batchDrawing = TRUE;
+		batchDrawing = true;
 		sth_begin_draw(stash);
 	}
 }
 
 void ofxFontStash::endBatch(){
 	if(stash != NULL){
-		batchDrawing = FALSE;
+		batchDrawing = false;
 		sth_end_draw(stash);
 	}
 }
