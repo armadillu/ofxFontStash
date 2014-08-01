@@ -21,6 +21,8 @@
 // Oriol Ferrer Mesià made tiny modifications to make this render text flipped vertically
 // Also changed the include ifdefs
 
+// 31st July 2014 - Danoli3 - Daniel Rosser made minor macro modifictions to support Android and another iPhone Target.
+
 /*
  #ifdef __MACOSX__
  #include <OpenGL/gl.h>
@@ -37,11 +39,11 @@
 	#include "GL\wglew.h"
 #elif _WIN64
 #include <gl/gl.h>
+#elif __ANDROID__   // Danoli3 - Adding Android target as it is supported with OpenGLES
+#include <GLES/gl.h>
 #elif __APPLE__
 #include "TargetConditionals.h"
-#if (TARGET_OS_IPHONE)
-#import <OpenGLES/ES1/gl.h>
-#elif (TARGET_IPHONE_SIMULATOR)
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) // Danoli3 - adding missing iPhone target
 #import <OpenGLES/ES1/gl.h>
 #elif (TARGET_OS_MAC)
 #include <OpenGL/gl.h>
