@@ -94,17 +94,17 @@ void testApp::draw(){
 															x, y,		/*where*/
 															MAX( 10 ,mouseX - x), /*column width*/
 															numLines,	/*get back the number of lines*/
-															false,		/*if true, we wont draw (just get bbox back)*/
+															false,		/* if true, we wont draw (just get bbox back) */
 															5,			/* max number of lines to draw, crop after that */
-															true,	/*get the final formatting with added \n's*/
-															&wordsWereCropped
+															true,		/*get the final text formatting (by adding \n's) in the supplied string;
+																		 BE ARWARE that using TRUE in here will modify your supplied string! */
+															&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
 														 );
-	cout << "##############" << endl;
-	cout << s << endl;
-	cout << "##############" << endl;
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
+
+	//report if some words had to be cropped to fit in the column when using drawMultiLineColumn()
 	if(!wordsWereCropped) ofSetColor(255,32);
-	else ofSetColor(255,((ofGetFrameNum()%4 <= 1) ? 0:32));
+	else (ofGetFrameNum()%6 <= 2) ? ofSetColor(255,32):ofSetColor(255,0,0,32); //flash if cropped
 	ofRect(column);
 
 
