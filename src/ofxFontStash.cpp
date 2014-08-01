@@ -61,6 +61,7 @@ ofxFontStash::~ofxFontStash(){
 bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/, bool createMipMaps, int intraCharPadding){
 	
 	if (stash == NULL){
+		extraPadding = intraCharPadding;
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(texDimension);
 		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding);
@@ -308,7 +309,7 @@ string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr en
 
 ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy ){
 
-	ofRectangle r;
+	ofRectangle totalArea;
 
 	if (stash != NULL){
 		stringstream ss(text);
@@ -320,13 +321,13 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 			float dx = 0;
 			float w, h, x, y;
 			sth_dim_text( stash, stashFontID, size, s.c_str(), &x, &y, &w, &h);
-			r.x = x + xx;
-			r.y = yy + y ;
+			totalArea.x = x + xx;
+			totalArea.y = yy + y ;
 			w = fabs (w - x);
 			h = fabs(y - h);
-			if(w > r.width) r.width = w;
-			if(h > r.height) r.height = h;
-			ofRectangle r2 = r;
+			if(w > totalArea.width) totalArea.width = w;
+			if(h > totalArea.height) totalArea.height = h;
+			ofRectangle r2 = totalArea;
 			r2.y -= r2.height;
 			r2.y += size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line;
 			rects.push_back(r2);
@@ -336,20 +337,26 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		}
 
 		if(line > 1){ //if multiline
-			r.y -= rects[0].height;
+			totalArea.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
 				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
-				r = r.getUnion(rects[i]);	//TODO
+				totalArea = totalArea.getUnion(rects[i]);	//TODO
 				#endif
 			}
 		}else{
-			r.y -= r.height;
+			totalArea.y -= totalArea.height;
 		}
 
 	}else{
 		ofLogError("ofxFontStash", "can't getBoundingBoxSize() without having been setup first!");
 	}
-	return r;
+
+	if(extraPadding > 0){
+		totalArea.width -= extraPadding;
+		totalArea.height -= extraPadding;
+	}
+
+	return totalArea;
 }
 
 
