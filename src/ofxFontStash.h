@@ -93,7 +93,8 @@ class ofxFontStash{
 		void setLineHeight(float percent);
 
 	private:
-		
+
+		int					extraPadding; //used for mipmaps
 		float				lineHeight; // as percent, 1.0 would be normal
 		struct sth_stash*	stash;
 		int					stashFontID;
