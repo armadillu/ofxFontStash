@@ -1,7 +1,7 @@
-#include "testApp.h"
+#include "ofApp.h"
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
 
 	ofEnableAlphaBlending();
 	ofSetVerticalSync(true);
@@ -15,7 +15,7 @@ void testApp::setup(){
 
 
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
 
 	float lineHeight = ofMap(mouseY, 0, ofGetHeight(), 0, 2, true);
 	unicodeFont.setLineHeight(lineHeight);
@@ -131,7 +131,7 @@ void testApp::draw(){
 }
 
 
-void testApp::drawPoint(float x, float y){
+void ofApp::drawPoint(float x, float y){
 	ofSetColor(0, 255, 0, 128);	
 	ofCircle(x, y, 2);
 }
