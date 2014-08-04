@@ -20,6 +20,19 @@
 #ifndef FONTSTASH_H
 #define FONTSTASH_H
 
+struct sth_stash
+{
+	int tw,th;
+	float itw,ith;
+	GLubyte *empty_data;
+	struct sth_texture* tt_textures;
+	struct sth_texture* bm_textures;
+	struct sth_font* fonts;
+	int drawing;
+	int padding; //oriol adding texture padding around chars to avoid mipmap neighbor leaks
+	_Bool hasMipMap; //oriol adding optional mipmap generation to each char
+	_Bool doKerning;
+};
 
 struct sth_stash* sth_create(int cachew, int cacheh, _Bool createMipmaps, int charPadding);
 

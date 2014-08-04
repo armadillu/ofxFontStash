@@ -65,6 +65,7 @@ bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDime
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(texDimension);
 		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding);
+		stash->doKerning = false; //kerning disabled by default
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
 			ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
@@ -291,8 +292,8 @@ void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y
 	}else{
 		ofLogError("ofxFontStash", "can't drawMultiLineBatch() without having been setup first!");
 	}
-
 }
+
 
 string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
 
@@ -305,6 +306,15 @@ string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr en
 		}
 	}
 	return finalLine;
+}
+
+
+void ofxFontStash::setKerning(bool enabled){
+	if (stash){
+		stash->doKerning = enabled;
+	}else{
+		ofLogError("ofxFontStash", "can't setKerning() without having been setup() first!");
+	}
 }
 
 ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy ){
