@@ -154,7 +154,7 @@ struct sth_stash
 	struct sth_font* fonts;
 	int drawing;
 	int padding; //oriol adding texture padding around chars to avoud mipmap leaks
-	_Bool hasMipMap; //oriol adding optional mipmap generation to each char
+	int hasMipMap; //oriol adding optional mipmap generation to each char
 };
 
 
@@ -194,7 +194,7 @@ static unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned i
 
 
 
-struct sth_stash* sth_create(int cachew, int cacheh, _Bool createMipmaps, int charPadding)
+struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding)
 {
 	struct sth_stash* stash = NULL;
 	GLubyte* empty_data = NULL;
@@ -557,7 +557,7 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	//oriol trying to get rid of halos when rotating font
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);	//
 		glTexSubImage2D(GL_TEXTURE_2D, 0, glyph->x0,glyph->y0, gw,gh, GL_ALPHA,GL_UNSIGNED_BYTE,bmp);
-		if(stash->hasMipMap){
+		if(stash->hasMipMap > 0){
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); //TODO check for hw support!
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
