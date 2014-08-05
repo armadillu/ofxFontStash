@@ -158,3 +158,9 @@ void testApp::drawPoint(float x, float y){
 	ofSetColor(0, 255, 0, 128);	
 	ofCircle(x, y, 2);
 }
+
+
+void testApp::keyPressed(int k){
+	font.setKerning(!font.getKerning());
+	unicodeFont.setKerning(!unicodeFont.getKerning());
+}

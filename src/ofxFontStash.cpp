@@ -96,6 +96,7 @@ void ofxFontStash::draw( string text, float size, float x, float y){
 	}		
 }
 
+
 void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	
 	if (stash != NULL){
@@ -120,6 +121,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 		ofLogError("ofxFontStash", "can't drawMultiLine() without having been setup first!");
 	}		
 }
+
 
 ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float x, float y,
 											  float maxW, int &numLines, bool dontDraw, int maxLines,
@@ -315,6 +317,16 @@ void ofxFontStash::setKerning(bool enabled){
 	}else{
 		ofLogError("ofxFontStash", "can't setKerning() without having been setup() first!");
 	}
+}
+
+
+bool ofxFontStash::getKerning(){
+	if (stash){
+		return stash->doKerning;
+	}else{
+		ofLogError("ofxFontStash", "can't getKerning() without having been setup() first!");
+	}
+	return false;
 }
 
 ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy ){

@@ -759,7 +759,7 @@ void sth_dim_text(struct sth_stash* stash,
 		int diff = 0;
 		if (c < len && stash->doKerning){
 			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
-			printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
+			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
 		}
 		x += diff/10.0f;
 
