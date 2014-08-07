@@ -749,6 +749,7 @@ void sth_dim_text(struct sth_stash* stash,
 	if (fnt->type != BMFONT && !fnt->data) return;
 
 	int len = strlen(s);
+	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
 	int c = 0;
 	for (; *s; ++s){
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
@@ -760,8 +761,8 @@ void sth_dim_text(struct sth_stash* stash,
 		if (c < len && stash->doKerning){
 			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
+			x += diff * scale;
 		}
-		x += diff/10.0f;
 
 		if (q.x0 < *minx) *minx = q.x0;
 		if (q.x1 > *maxx) *maxx = q.x1;
