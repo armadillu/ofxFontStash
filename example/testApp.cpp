@@ -89,17 +89,17 @@ void testApp::draw(){
 	TIME_SAMPLE_START("drawMultiLineColumn");
 	int numLines = 0;
 	bool wordsWereCropped;
-	ofRectangle column = unicodeFont.drawMultiLineColumn(	s,			/*string*/
-															fontSize,	/*size*/
-															x, y,		/*where*/
-															MAX( 10 ,mouseX - x), /*column width*/
-															numLines,	/*get back the number of lines*/
-															false,		/* if true, we wont draw (just get bbox back) */
-															5,			/* max number of lines to draw, crop after that */
-															true,		/*get the final text formatting (by adding \n's) in the supplied string;
-																		 BE ARWARE that using TRUE in here will modify your supplied string! */
-															&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
-														 );
+	ofRectangle column = font.drawMultiLineColumn(	s,			/*string*/
+													fontSize,	/*size*/
+													x, y,		/*where*/
+													MAX( 10 ,mouseX - x), /*column width*/
+													numLines,	/*get back the number of lines*/
+													false,		/* if true, we wont draw (just get bbox back) */
+													5,			/* max number of lines to draw, crop after that */
+													true,		/*get the final text formatting (by adding \n's) in the supplied string;
+																 BE ARWARE that using TRUE in here will modify your supplied string! */
+													&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
+												 );
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
 
 	//report if some words had to be cropped to fit in the column when using drawMultiLineColumn()
@@ -157,4 +157,10 @@ void testApp::draw(){
 void testApp::drawPoint(float x, float y){
 	ofSetColor(0, 255, 0, 128);	
 	ofCircle(x, y, 2);
+}
+
+
+void testApp::keyPressed(int k){
+	font.setKerning(!font.getKerning());
+	unicodeFont.setKerning(!unicodeFont.getKerning());
 }

@@ -531,7 +531,6 @@ extern void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info, int codepoint
 
 extern int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2);
 // an additional amount to add to the 'advance' value between ch1 and ch2
-// @TODO; for now always returns 0!
 
 extern int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1);
 // Gets the bounding box of the visible part of the glyph, in unscaled coordinates

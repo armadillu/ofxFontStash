@@ -92,6 +92,11 @@ class ofxFontStash{
 
 		void setLineHeight(float percent);
 
+		void setKerning(bool enabled); //use ttf supplied kerning info at draw time or not
+		bool getKerning();
+
+		sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
+
 	private:
 
 		int					extraPadding; //used for mipmaps

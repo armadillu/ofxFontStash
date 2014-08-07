@@ -66,6 +66,7 @@
 
 /* @rlyeh: removed STB_TRUETYPE_IMPLENTATION. We link it externally */
 #include "stb_truetype.h"
+#include "fontstash.h"
 
 #define HASH_LUT_SIZE 256
 #define MAX_ROWS 128
@@ -143,20 +144,6 @@ struct sth_texture
 	int nverts;
 	struct sth_texture* next;
 };
-
-struct sth_stash
-{
-	int tw,th;
-	float itw,ith;
-	GLubyte *empty_data;
-	struct sth_texture* tt_textures;
-	struct sth_texture* bm_textures;
-	struct sth_font* fonts;
-	int drawing;
-	int padding; //oriol adding texture padding around chars to avoud mipmap leaks
-	int hasMipMap; //oriol adding optional mipmap generation to each char
-};
-
 
 
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
@@ -446,7 +433,6 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
 	stbtt_GetGlyphBitmapBox(&fnt->font, g, scale,scale, &x0,&y0,&x1,&y1);
 
-
 	gw = x1-x0 + stash->padding;
 	gh = y1-y0 + stash->padding;
 	
@@ -696,7 +682,10 @@ void sth_draw_text(struct sth_stash* stash,
 	while(fnt != NULL && fnt->idx != idx) fnt = fnt->next;
 	if (fnt == NULL) return;
 	if (fnt->type != BMFONT && !fnt->data) return;
-	
+
+	int len = strlen(s);
+	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
+	int c = 0;
 	for (; *s; ++s)
 	{
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
@@ -707,11 +696,19 @@ void sth_draw_text(struct sth_stash* stash,
 			flush_draw(stash);
 		
 		if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
-		
+
+		int diff = 0;
+		if (c < len && stash->doKerning > 0){
+			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
+			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
+			x += diff * scale;
+		}
+
 		v = &texture->verts[texture->nverts*4];
 
 		int p = stash->padding;
 		float tw = stash->padding / (float)stash->tw;
+
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
 		v = setv(v, q.x1 - p, q.y0, q.s1 - tw, q.t0);
 		v = setv(v, q.x1 - p, q.y1 - p, q.s1 - tw, q.t1 - tw);
@@ -721,6 +718,7 @@ void sth_draw_text(struct sth_stash* stash,
 		v = setv(v, q.x0, q.y1 - p, q.s0, q.t1 - tw);
 		
 		texture->nverts += 6;
+		c++;
 	}
 	
 	if (dx) *dx = x;
@@ -746,17 +744,28 @@ void sth_dim_text(struct sth_stash* stash,
 	while(fnt != NULL && fnt->idx != idx) fnt = fnt->next;
 	if (fnt == NULL) return;
 	if (fnt->type != BMFONT && !fnt->data) return;
-	
-	for (; *s; ++s)
-	{
+
+	int len = strlen(s);
+	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
+	int c = 0;
+	for (; *s; ++s){
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
 		glyph = get_glyph(stash, fnt, codepoint, isize);
 		if (!glyph) continue;
 		if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
+
+		int diff = 0;
+		if (c < len && stash->doKerning > 0){
+			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
+			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
+			x += diff * scale;
+		}
+
 		if (q.x0 < *minx) *minx = q.x0;
 		if (q.x1 > *maxx) *maxx = q.x1;
 		if (q.y1 > *miny) *miny = q.y1;		//oriol changed "<" direction bc its flipped to fit OF
 		if (q.y0 < *maxy) *maxy = q.y0;		//idem
+		c++;
 	}
 	if (floorf(x) > *maxx) *maxx = floorf(x);
 }
