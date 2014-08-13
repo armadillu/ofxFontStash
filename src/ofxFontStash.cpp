@@ -58,12 +58,14 @@ ofxFontStash::~ofxFontStash(){
 	if(stash != NULL) sth_delete(stash);
 }
 
-bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/){
+bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/, bool createMipMaps, int intraCharPadding){
 	
 	if (stash == NULL){
+		extraPadding = intraCharPadding;
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(texDimension);
-		stash = sth_create(texDimension,texDimension);
+		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding);
+		stash->doKerning = 0; //kerning disabled by default
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
 			ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
@@ -94,6 +96,7 @@ void ofxFontStash::draw( string text, float size, float x, float y){
 	}		
 }
 
+
 void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 	
 	if (stash != NULL){
@@ -118,6 +121,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 		ofLogError("ofxFontStash", "can't drawMultiLine() without having been setup first!");
 	}		
 }
+
 
 ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float x, float y,
 											  float maxW, int &numLines, bool dontDraw, int maxLines,
@@ -243,14 +247,14 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 
 void ofxFontStash::beginBatch(){
 	if(stash != NULL){
-		batchDrawing = TRUE;
+		batchDrawing = true;
 		sth_begin_draw(stash);
 	}
 }
 
 void ofxFontStash::endBatch(){
 	if(stash != NULL){
-		batchDrawing = FALSE;
+		batchDrawing = false;
 		sth_end_draw(stash);
 	}
 }
@@ -290,8 +294,8 @@ void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y
 	}else{
 		ofLogError("ofxFontStash", "can't drawMultiLineBatch() without having been setup first!");
 	}
-
 }
+
 
 string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
 
@@ -306,9 +310,28 @@ string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr en
 	return finalLine;
 }
 
+
+void ofxFontStash::setKerning(bool enabled){
+	if (stash){
+		stash->doKerning = enabled ? 1 : 0;
+	}else{
+		ofLogError("ofxFontStash", "can't setKerning() without having been setup() first!");
+	}
+}
+
+
+bool ofxFontStash::getKerning(){
+	if (stash){
+		return stash->doKerning != 0;
+	}else{
+		ofLogError("ofxFontStash", "can't getKerning() without having been setup() first!");
+	}
+	return false;
+}
+
 ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy ){
 
-	ofRectangle r;
+	ofRectangle totalArea;
 
 	if (stash != NULL){
 		stringstream ss(text);
@@ -320,13 +343,13 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 			float dx = 0;
 			float w, h, x, y;
 			sth_dim_text( stash, stashFontID, size, s.c_str(), &x, &y, &w, &h);
-			r.x = x + xx;
-			r.y = yy + y ;
+			totalArea.x = x + xx;
+			totalArea.y = yy + y ;
 			w = fabs (w - x);
 			h = fabs(y - h);
-			if(w > r.width) r.width = w;
-			if(h > r.height) r.height = h;
-			ofRectangle r2 = r;
+			if(w > totalArea.width) totalArea.width = w;
+			if(h > totalArea.height) totalArea.height = h;
+			ofRectangle r2 = totalArea;
 			r2.y -= r2.height;
 			r2.y += size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line;
 			rects.push_back(r2);
@@ -336,20 +359,26 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		}
 
 		if(line > 1){ //if multiline
-			r.y -= rects[0].height;
+			totalArea.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
 				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
-				r = r.getUnion(rects[i]);	//TODO
+				totalArea = totalArea.getUnion(rects[i]);	//TODO
 				#endif
 			}
 		}else{
-			r.y -= r.height;
+			totalArea.y -= totalArea.height;
 		}
 
 	}else{
 		ofLogError("ofxFontStash", "can't getBoundingBoxSize() without having been setup first!");
 	}
-	return r;
+
+	if(extraPadding > 0){
+		totalArea.width -= extraPadding;
+		totalArea.height -= extraPadding;
+	}
+
+	return totalArea;
 }
 
 

@@ -290,9 +290,9 @@ unsigned char screen[20][79];
 int main(int arg, char **argv)
 {
    stbtt_fontinfo font;
-   int i,j,ascent,baseline,ch=0;
-   float scale, xpos=0;
-   char *text = "Heljo World!";
+	int i,j,ascent,baseline,ch=0;
+	float scale, xpos=2;  // leave a little padding in case the character extends left
+	char *text = "Heljo World!";
 
    fread(buffer, 1, 1000000, fopen("c:/windows/fonts/arialbd.ttf", "rb"));
    stbtt_InitFont(&font, buffer, 0);
@@ -531,7 +531,6 @@ extern void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info, int codepoint
 
 extern int  stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2);
 // an additional amount to add to the 'advance' value between ch1 and ch2
-// @TODO; for now always returns 0!
 
 extern int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1);
 // Gets the bounding box of the visible part of the glyph, in unscaled coordinates
@@ -1760,7 +1759,8 @@ unsigned char *stbtt_GetGlyphBitmapSubpixel(const stbtt_fontinfo *info, float sc
       scale_y = scale_x;
    }
 
-   stbtt_GetGlyphBitmapBox(info, glyph, scale_x, scale_y, &ix0,&iy0,&ix1,&iy1);
+   //stbtt_GetGlyphBitmapBox(info, glyph, scale_x, scale_y, &ix0,&iy0,&ix1,&iy1);
+	stbtt_GetGlyphBitmapBoxSubpixel(info, glyph, scale_x, scale_y, shift_x, shift_y, &ix0,&iy0,&ix1,&iy1);
 
    // now we get the size
    gbm.w = (ix1 - ix0);

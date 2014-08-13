@@ -8,8 +8,13 @@ void ofApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(22, 22, 22, 255);
 
-	font.setup("Vera.ttf"); //load verdana font, set lineHeight to be 130%
-	unicodeFont.setup("Arial Unicode.ttf"); //load verdana font, set lineHeight to be 130%
+	font.setup("Vera.ttf");
+	unicodeFont.setup("Arial Unicode.ttf", //font file, ttf only
+					  1.0,					//lineheight percent
+					  1024,					//texture atlas dimension
+					  true,					//create mipmaps of the font, useful to scale down the font at smaller sizes
+					  8						//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+					  );					//lower res mipmaps wil bleed into each other
 
 }
 
@@ -84,22 +89,22 @@ void ofApp::draw(){
 	TIME_SAMPLE_START("drawMultiLineColumn");
 	int numLines = 0;
 	bool wordsWereCropped;
-	ofRectangle column = unicodeFont.drawMultiLineColumn(	s,			/*string*/
-															fontSize,	/*size*/
-															x, y,		/*where*/
-															MAX( 10 ,mouseX - x), /*column width*/
-															numLines,	/*get back the number of lines*/
-															false,		/*if true, we wont draw (just get bbox back)*/
-															5,			/* max number of lines to draw, crop after that */
-															true,	/*get the final formatting with added \n's*/
-															&wordsWereCropped
-														 );
-	cout << "##############" << endl;
-	cout << s << endl;
-	cout << "##############" << endl;
+	ofRectangle column = font.drawMultiLineColumn(	s,			/*string*/
+													fontSize,	/*size*/
+													x, y,		/*where*/
+													MAX( 10 ,mouseX - x), /*column width*/
+													numLines,	/*get back the number of lines*/
+													false,		/* if true, we wont draw (just get bbox back) */
+													5,			/* max number of lines to draw, crop after that */
+													true,		/*get the final text formatting (by adding \n's) in the supplied string;
+																 BE ARWARE that using TRUE in here will modify your supplied string! */
+													&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
+												 );
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
+
+	//report if some words had to be cropped to fit in the column when using drawMultiLineColumn()
 	if(!wordsWereCropped) ofSetColor(255,32);
-	else ofSetColor(255,((ofGetFrameNum()%4 <= 1) ? 0:32));
+	else (ofGetFrameNum()%6 <= 2) ? ofSetColor(255,32):ofSetColor(255,0,0,32); //flash if cropped
 	ofRect(column);
 
 
@@ -127,11 +132,35 @@ void ofApp::draw(){
 		drawPoint(0,0);
 	ofPopMatrix();
 
+	// scaling text with mipmaps ///////////////////////////////////////////////////////
+
+	ofPushMatrix();
+	ofTranslate(600, 40);
+	float scale = mouseY /(float) ofGetHeight();
+	ofPushMatrix();
+	ofScale(scale, scale);
 	ofSetColor(255);
+	unicodeFont.draw("MIPMAPS :)", fontSize * 2, 0, 0 );
+	drawPoint(0,0);
+	ofPopMatrix();
+
+	ofTranslate(0, 30);
+	ofScale(scale, scale);
+	font.draw("NO MIPMAPS :(", fontSize * 2, 0, 0 );
+	drawPoint(0,0);
+	ofPopMatrix();
+
+
 }
 
 
 void ofApp::drawPoint(float x, float y){
 	ofSetColor(0, 255, 0, 128);	
 	ofCircle(x, y, 2);
+}
+
+
+void testApp::keyPressed(int k){
+	font.setKerning(!font.getKerning());
+	unicodeFont.setKerning(!unicodeFont.getKerning());
 }
