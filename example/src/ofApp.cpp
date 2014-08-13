@@ -160,7 +160,7 @@ void ofApp::drawPoint(float x, float y){
 }
 
 
-void testApp::keyPressed(int k){
+void ofApp::keyPressed(int k){
 	font.setKerning(!font.getKerning());
 	unicodeFont.setKerning(!unicodeFont.getKerning());
 }
