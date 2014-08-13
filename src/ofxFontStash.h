@@ -89,7 +89,7 @@ class ofxFontStash{
         void setSize(int fontsize);
         int getSize();
     
-        void getLineHeight();
+        float getLineHeight();
     
         float stringWidth(const string& s);
         float stringHeight(const string& s);

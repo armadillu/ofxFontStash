@@ -376,7 +376,7 @@ int ofxFontStash::getSize(){
     return fontSize;
 }
 
-void ofxFontStash::getLineHeight(){
+float ofxFontStash::getLineHeight(){
     return lineHeight;
 }
 
