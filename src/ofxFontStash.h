@@ -97,6 +97,24 @@ class ofxFontStash{
 
 		sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
 
+    
+        // ofTrueTypeFont parity methods
+        bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
+        bool isLoaded();
+    
+        void setSize(int fontsize);
+        int getSize();
+    
+        float getLineHeight();
+        float getSpaceSize();
+    
+        float stringWidth(const string& s);
+        float stringHeight(const string& s);
+    
+        ofRectangle getStringBoundingBox(const string& s, float x, float y);
+    
+        void drawString(const string& s, float x, float y);
+    
 	private:
 
 		int					extraPadding; //used for mipmaps
@@ -107,6 +125,9 @@ class ofxFontStash{
 
 		//fill in a string
 		string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
+    
+        // ofTrueTypeFont parity attributes
+        int fontSize;
 };
 
 

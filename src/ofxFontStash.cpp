@@ -385,3 +385,48 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 void ofxFontStash::setLineHeight(float percent){
 	lineHeight = percent;
 }
+
+//--------------------------------------------------------------
+// ofTrueTypeFont parity methods
+bool ofxFontStash::loadFont(string filename, int fsize, float lineHeightPercent, int textureDimension){
+    fontSize = fsize;
+    setup(filename, lineHeightPercent, textureDimension);
+}
+
+bool ofxFontStash::isLoaded(){
+    return (stash != NULL);
+}
+
+void ofxFontStash::setSize(int fsize){
+    fontSize = fsize;
+}
+
+int ofxFontStash::getSize(){
+    return fontSize;
+}
+
+float ofxFontStash::getLineHeight(){
+    return lineHeight * fontSize;
+}
+
+float ofxFontStash::getSpaceSize(){
+    return stringWidth(" ");
+}
+
+float ofxFontStash::stringWidth(const string& s){
+    ofRectangle rect = getStringBoundingBox(s, 0,0);
+    return rect.width;
+}
+
+float ofxFontStash::stringHeight(const string& s){
+    ofRectangle rect = getStringBoundingBox(s, 0,0);
+    return rect.height;
+}
+
+ofRectangle ofxFontStash::getStringBoundingBox(const string& s, float x, float y){
+    return getBBox(s, fontSize, x, y);
+}
+
+void ofxFontStash::drawString(const string& s, float x, float y){
+    draw(s, fontSize, x, y);
+}
