@@ -90,6 +90,7 @@ class ofxFontStash{
         int getSize();
     
         float getLineHeight();
+        float getSpaceSize();
     
         float stringWidth(const string& s);
         float stringHeight(const string& s);

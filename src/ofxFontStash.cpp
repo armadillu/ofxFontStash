@@ -380,6 +380,10 @@ float ofxFontStash::getLineHeight(){
     return lineHeight;
 }
 
+float ofxFontStash::getSpaceSize(){
+    return stringWidth(" ");
+}
+
 float ofxFontStash::stringWidth(const string& s){
     ofRectangle rect = getStringBoundingBox(s, 0,0);
     return rect.width;
