@@ -41,10 +41,12 @@
 #include <gl/gl.h>
 #elif __ANDROID__   // Danoli3 - Adding Android target as it is supported with OpenGLES
 #include <GLES/gl.h>
+#include <GLES/glext.h>
 #elif __APPLE__
 #include "TargetConditionals.h"
-#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) // Danoli3 - adding missing iPhone target
+#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) // Danoli3 - adding missing iPhone target
 #import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
 #elif (TARGET_OS_MAC)
 #include <OpenGL/gl.h>
 #else
@@ -546,9 +548,13 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 		if(stash->hasMipMap > 0){
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); //TODO check for hw support!
+#if defined(__ANDROID__) || defined(TARGET_OS_IPHONE_SIMULATOR) || defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE) || defined(TARGET_IPHONE)
+				// OpenGLES 1.0 does not support the following.
+#else
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
 			glGenerateMipmap(GL_TEXTURE_2D);
+#endif
 		}
 		free(bmp);
 	}
