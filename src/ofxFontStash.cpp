@@ -209,6 +209,8 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		if (maxLines > 0 ){
 			linesToDraw = MIN(splitLines.size(), maxLines);
 			numLines = splitLines.size();
+		}else{
+			linesToDraw = splitLines.size();
 		}
 
 		for(int i = 0; i < linesToDraw; i++){
