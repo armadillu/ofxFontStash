@@ -20,6 +20,10 @@
 #ifndef FONTSTASH_H
 #define FONTSTASH_H
 
+#if __cplusplus
+extern "C" {
+#endif
+
 struct sth_stash
 {int tw,th;
 	float itw,ith;
@@ -32,6 +36,7 @@ struct sth_stash
 	int hasMipMap; //oriol adding optional mipmap generation to each char
 	int doKerning; //calc kerning on the fly and offset letters when drawing and / calcing box sizes
 };
+
 
 struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding);
 
@@ -59,4 +64,9 @@ void sth_vmetrics(struct sth_stash* stash,
 
 void sth_delete(struct sth_stash* stash);
 
+#if __cplusplus
+}
+#endif
+
 #endif // FONTSTASH_H
+

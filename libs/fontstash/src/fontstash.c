@@ -79,8 +79,6 @@
 #define TTFONT_MEM  2
 #define BMFONT      3
 
-#define MIPMAPS			1
-
 static int idx = 1;
 
 
