@@ -33,12 +33,10 @@
 
 //oriol replacing platform includes to work better in OpenFrameworks
 //from http://stackoverflow.com/questions/5919996/how-to-detect-reliably-mac-os-x-ios-linux-windows-in-c-preprocessor
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 	//#include <gl/gl.h> //oriol making it work for win32
 	#include "GL\glew.h"
 	#include "GL\wglew.h"
-#elif _WIN64
-#include <gl/gl.h>
 #elif __ANDROID__   // Danoli3 - Adding Android target as it is supported with OpenGLES
 #include <GLES/gl.h>
 #include <GLES/glext.h>
