@@ -42,7 +42,7 @@
 #include <GLES/glext.h>
 #elif __APPLE__
 #include "TargetConditionals.h"
-#if (TARGET_OS_IPHONE_SIMULATOR) || (TARGET_IPHONE_SIMULATOR) || (TARGET_OS_IPHONE) || (TARGET_IPHONE) // Danoli3 - adding missing iPhone target
+#if defined(__ANDROID__) || defined(TARGET_OS_IPHONE_SIMULATOR) || (TARGET_IPHONE_SIMULATOR == 1) || (TARGET_OS_IPHONE == 1) || defined(TARGET_IPHONE)
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
 #elif (TARGET_OS_MAC)
