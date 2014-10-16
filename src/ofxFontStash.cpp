@@ -66,6 +66,7 @@ bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDime
 		texDimension = ofNextPow2(texDimension);
 		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding);
 		stash->doKerning = 0; //kerning disabled by default
+		stash->charSpacing = 0.0; //spacing neutral by default
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
 			ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );

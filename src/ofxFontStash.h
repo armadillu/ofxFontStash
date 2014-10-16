@@ -107,6 +107,9 @@ class ofxFontStash{
     
         float getLineHeight();
         float getSpaceSize();
+
+		float getCharacterSpacing(){return stash->charSpacing;}
+		float setCharacterSpacing(float spacing){stash->charSpacing = spacing;}
     
         float stringWidth(const string& s);
         float stringHeight(const string& s);

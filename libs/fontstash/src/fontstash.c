@@ -216,7 +216,8 @@ struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int char
 
 	stash->hasMipMap = createMipmaps;
 	stash->padding = charPadding;
-
+	stash->charSpacing = 0.0f;
+	stash->doKerning = 0;
 	return stash;
 	
 error:
@@ -688,6 +689,11 @@ void sth_draw_text(struct sth_stash* stash,
 	int len = strlen(s);
 	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
 	int c = 0;
+	float spacing = stash->charSpacing;
+	int doKerning = stash->doKerning;
+	int p = stash->padding;
+	float tw = stash->padding / (float)stash->tw;
+
 	for (; *s; ++s)
 	{
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
@@ -700,16 +706,14 @@ void sth_draw_text(struct sth_stash* stash,
 		if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
 
 		int diff = 0;
-		if (c < len && stash->doKerning > 0){
+		if (c < len && doKerning > 0){
 			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
 			x += diff * scale;
 		}
+		x += scale + spacing;
 
 		v = &texture->verts[texture->nverts*4];
-
-		int p = stash->padding;
-		float tw = stash->padding / (float)stash->tw;
 
 		v = setv(v, q.x0, q.y0, q.s0, q.t0);
 		v = setv(v, q.x1 - p, q.y0, q.s1 - tw, q.t0);
@@ -750,6 +754,9 @@ void sth_dim_text(struct sth_stash* stash,
 	int len = strlen(s);
 	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
 	int c = 0;
+	float spacing = stash->charSpacing;
+	int doKerning = stash->doKerning;
+
 	for (; *s; ++s){
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
 		glyph = get_glyph(stash, fnt, codepoint, isize);
@@ -757,11 +764,12 @@ void sth_dim_text(struct sth_stash* stash,
 		if (!get_quad(stash, fnt, glyph, isize, &x, &y, &q)) continue;
 
 		int diff = 0;
-		if (c < len && stash->doKerning > 0){
+		if (c < len && doKerning > 0){
 			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
-			x += diff * scale;
+			x += diff * scale + spacing;
 		}
+		x += scale + spacing;
 
 		if (q.x0 < *minx) *minx = q.x0;
 		if (q.x1 > *maxx) *maxx = q.x1;

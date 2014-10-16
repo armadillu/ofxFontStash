@@ -35,6 +35,7 @@ struct sth_stash
 	int padding; //oriol adding texture padding around chars to avoid mipmap neighbor leaks
 	int hasMipMap; //oriol adding optional mipmap generation to each char
 	int doKerning; //calc kerning on the fly and offset letters when drawing and / calcing box sizes
+	float charSpacing;
 };
 
 
