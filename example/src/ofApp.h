@@ -2,11 +2,12 @@
 
 #include "ofMain.h"
 #include "ofxFontStash.h"
+#include "ofxRemoteUIServer.h"
 
 //comment this line to ignore "ofxTimeMeasurements" calls
 //enabling it requires the ofxTimeMeasurements addon
 //https://github.com/armadillu/ofxTimeMeasurements
-//#define MEASURE_PERFORMANCE
+#define MEASURE_PERFORMANCE
 
 #ifdef MEASURE_PERFORMANCE
 	#include "ofxTimeMeasurements.h"

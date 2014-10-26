@@ -179,8 +179,8 @@ static unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned i
 
 
 
-struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding)
-{
+struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding, float dpiScale){
+
 	struct sth_stash* stash = NULL;
 	GLubyte* empty_data = NULL;
 	struct sth_texture* texture = NULL;
@@ -207,6 +207,7 @@ struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int char
 	stash->ith = 1.0f/cacheh;
 	stash->empty_data = empty_data;
 	stash->tt_textures = texture;
+	stash->dpiScale = dpiScale;
 	glGenTextures(1, &texture->id);
 	if (!texture->id) goto error;
 	glBindTexture(GL_TEXTURE_2D, texture->id);
@@ -426,7 +427,7 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	if (fnt->type == BMFONT) return 0;
 	
 	// For truetype fonts: create this glyph.
-	scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
+	scale = stash->dpiScale * stbtt_ScaleForPixelHeight(&fnt->font, size);
 	g = stbtt_FindGlyphIndex(&fnt->font, codepoint);
 	if(!g) return 0; /* @rlyeh: glyph not found, ie, arab chars */
 	stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
@@ -567,14 +568,14 @@ error:
 static int get_quad(struct sth_stash* stash, struct sth_font* fnt, struct sth_glyph* glyph, short isize, float* x, float* y, struct sth_quad* q)
 {
 	int rx,ry;
-	float scale = 1.0f;
+	float scale = 1.0f ;
 
 	if (fnt->type == BMFONT) scale = isize/(glyph->size*10.0f);
 
 	rx = floorf(*x + scale * glyph->xoff);
 	//ry = floorf(*y - scale * glyph->yoff); //oriol flipped vertically to better match openFrameworks
 	ry = floorf(*y + scale * glyph->yoff);
-	
+
 	q->x0 = rx;
 	q->y0 = ry;
 	q->x1 = rx + scale * (glyph->x1 - glyph->x0);
@@ -607,7 +608,10 @@ static void flush_draw(struct sth_stash* stash)
 	while (texture)
 	{
 		if (texture->nverts > 0)
-		{			
+		{
+			glPushMatrix();
+			float ss = 1.0f / stash->dpiScale;
+			glScalef(ss, ss, ss);
 			glBindTexture(GL_TEXTURE_2D, texture->id);
 			glEnable(GL_TEXTURE_2D);
 			glEnableClientState(GL_VERTEX_ARRAY);
@@ -618,6 +622,7 @@ static void flush_draw(struct sth_stash* stash)
 			glDisable(GL_TEXTURE_2D);
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glPopMatrix();
 			texture->nverts = 0;
 		}
 		texture = texture->next;

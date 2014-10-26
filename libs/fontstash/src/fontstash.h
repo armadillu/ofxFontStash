@@ -36,10 +36,11 @@ struct sth_stash
 	int hasMipMap; //oriol adding optional mipmap generation to each char
 	int doKerning; //calc kerning on the fly and offset letters when drawing and / calcing box sizes
 	float charSpacing;
+	float dpiScale;
 };
 
 
-struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding);
+struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding, float dpiScale);
 
 int sth_add_font(struct sth_stash* stash, const char* path);
 int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer);
