@@ -97,8 +97,8 @@ class ofxFontStash{
 		bool getKerning();
 
 		sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
+		float getDpiScale(){return dpiScale;}
 
-    
         // ofTrueTypeFont parity methods
         bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
         bool isLoaded();

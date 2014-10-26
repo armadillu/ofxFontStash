@@ -18,8 +18,6 @@ void ofApp::setup(){
 					  );					//lower res mipmaps wil bleed into each other
 
 	TIME_SAMPLE_SET_DRAW_LOCATION(TIME_MEASUREMENTS_TOP_RIGHT);
-	RUI_SETUP();
-
 }
 
 
