@@ -549,8 +549,9 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 #if defined(__ANDROID__) || defined(TARGET_OS_IPHONE_SIMULATOR) || (TARGET_IPHONE_SIMULATOR == 1) || (TARGET_OS_IPHONE == 1) || defined(TARGET_IPHONE)
 				// OpenGLES 1.0 does not support the following.
 #else
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
+//			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0);
 			glGenerateMipmap(GL_TEXTURE_2D);
 #endif
 		}
@@ -599,6 +600,22 @@ static float* setv(float* v, float x, float y, float s, float t)
 	v[2] = s;
 	v[3] = t;
 	return v+4;
+}
+
+
+void set_lod_bias(struct sth_stash* stash, float bias){
+
+	struct sth_texture* texture = stash->tt_textures;
+	if(stash->hasMipMap > 0){
+		while (texture){
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, texture->id);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glDisable(GL_TEXTURE_2D);
+			texture = texture->next;
+		}
+	}
 }
 
 static void flush_draw(struct sth_stash* stash)

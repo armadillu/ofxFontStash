@@ -17,9 +17,14 @@ void ofApp::setup(){
 					  2.0f					//dpi scaleup, render textures @2x the reso
 					  );					//lower res mipmaps wil bleed into each other
 
+
 	TIME_SAMPLE_SET_DRAW_LOCATION(TIME_MEASUREMENTS_TOP_RIGHT);
 }
 
+void ofApp::update(){
+	//you can set a mipmap bias for fonts for which you created mipmaps
+	unicodeFont.setLodBias(ofMap(ofGetMouseX(), 0, ofGetWidth(), -1, 1));
+}
 
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -36,7 +41,7 @@ void ofApp::draw(){
 	// simple demo //////////////////////////////////////////////////////////
 	
 	drawPoint(x, y);		//draw insertion point	
-	
+
 	ofSetColor(255);
 	TIME_SAMPLE_START("simple draw");
 	font.draw(

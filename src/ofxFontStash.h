@@ -98,6 +98,7 @@ class ofxFontStash{
 
 		sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
 		float getDpiScale(){return dpiScale;}
+		void setLodBias(float bias); //only makes sense when using mipmaps!
 
         // ofTrueTypeFont parity methods
         bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);

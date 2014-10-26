@@ -264,6 +264,12 @@ void ofxFontStash::endBatch(){
 	}
 }
 
+void ofxFontStash::setLodBias(float bias){
+	if(stash != NULL){
+		set_lod_bias(stash, bias);
+	}
+}
+
 void ofxFontStash::drawBatch( string text, float size, float x, float y){
 	if (stash != NULL){
 		if(batchDrawing){

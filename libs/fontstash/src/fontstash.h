@@ -66,6 +66,8 @@ void sth_vmetrics(struct sth_stash* stash,
 
 void sth_delete(struct sth_stash* stash);
 
+void set_lod_bias(struct sth_stash* stash, float bias);
+
 #if __cplusplus
 }
 #endif
