@@ -17,8 +17,6 @@ void ofApp::setup(){
 					  2.0f					//dpi scaleup, render textures @2x the reso
 					  );					//lower res mipmaps wil bleed into each other
 
-
-	TIME_SAMPLE_SET_DRAW_LOCATION(TIME_MEASUREMENTS_TOP_RIGHT);
 }
 
 void ofApp::update(){
