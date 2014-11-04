@@ -403,6 +403,10 @@ void ofxFontStash::setLineHeight(float percent){
 //--------------------------------------------------------------
 // ofTrueTypeFont parity methods
 bool ofxFontStash::loadFont(string filename, int fsize, float lineHeightPercent, int textureDimension){
+    return load(filename, fsize, lineHeightPercent, textureDimension);
+}
+
+bool ofxFontStash::load(string filename, int fsize, float lineHeightPercent, int textureDimension){
     fontSize = fsize;
     return setup(filename, lineHeightPercent, textureDimension);
 }
