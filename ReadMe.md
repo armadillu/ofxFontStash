@@ -6,14 +6,16 @@ Quick and simple Addon wrapping [Font-Stash](https://github.com/akrinke/Font-Sta
 
 Main Features:
 
-* fast
-* draw unicode strings
-* mipmapped font textures, scale down your text and it still looks ok
-* kerning 
-* draw text columns, limit number of lines in column
-* shitty api (sorry!)
+* Loads TTF (sorry, no OFT!)
+* Much faster than ofTrueTypeFont
+* Draw Unicode strings
+* Mip mapped font textures, scale down your text and it still looks ok
+* Retina - render the tex atlases at higher internal DPI - nice with mipmaps!
+* Kerning, line height and intra-character spacing
+* Flows paragraphs in boxes, allowing you to limit the number of lines
+* Shitty & confusing api (sorry, I add new stuff when I need it!)
 
-I made tiny modifications to FontStash to render text flipped vertically, to play nicer in the OpenFrameworks universe in general. It will also report every time a new texture is created.
+I made tiny modifications to FontStash to render text flipped vertically, to play nicer in the OpenFrameworks universe in general. It will also report every time a new texture is created. Other modifications have been made to support mipmaps, character spacing, kerning, and retina support.
 
 ofxFontStash supports basic one-line text drawing, lineHeight, multiline text rendering based on '\n', and also word wraping to draw a paragraph constrained to a certain width. It also offers bbox calculations on all the drawing options. It requires [ofxUnicode](http://github.com/bakercp/ofxUnicode).
 

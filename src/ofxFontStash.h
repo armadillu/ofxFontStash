@@ -34,7 +34,7 @@
 #ifndef ofxFontStash_h
 #define ofxFontStash_h
 
-#define OFX_FONT_STASH_LINE_HEIGHT_MULT	0.8
+#define OFX_FONT_STASH_LINE_HEIGHT_MULT	0.9
 
 #include "ofMain.h"
 #include "ofUTF8.h"
@@ -61,8 +61,9 @@ class ofxFontStash{
 												//in the altases, otherwise the mipmaps will leak when
 												//using smaller sizes, and characters will have white
 												//outlines around them
-				   int intraCharPadding = 0	//padding around each character in the texture atlas;
+				   int intraCharPadding = 0,	//padding around each character in the texture atlas;
 												//wastes texture space, but makes mipmaps work.
+				   float dpiScale = 1.0f		//character texture is rendered internally at this scale
 				   );
 
 		//will draw text in one line, ignoring "\n"'s
@@ -96,8 +97,9 @@ class ofxFontStash{
 		bool getKerning();
 
 		sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
+		float getDpiScale(){return dpiScale;}
+		void setLodBias(float bias); //only makes sense when using mipmaps!
 
-    
         // ofTrueTypeFont parity methods
         bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
         bool isLoaded();
@@ -107,6 +109,9 @@ class ofxFontStash{
     
         float getLineHeight();
         float getSpaceSize();
+
+		float getCharacterSpacing(){return stash->charSpacing;}
+		void setCharacterSpacing(float spacing){stash->charSpacing = spacing;}
     
         float stringWidth(const string& s);
         float stringHeight(const string& s);
@@ -127,7 +132,8 @@ class ofxFontStash{
 		string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
     
         // ofTrueTypeFont parity attributes
-        int fontSize;
+        int					fontSize;
+		float				dpiScale;
 };
 
 

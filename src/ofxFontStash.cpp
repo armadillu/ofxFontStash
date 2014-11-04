@@ -58,14 +58,17 @@ ofxFontStash::~ofxFontStash(){
 	if(stash != NULL) sth_delete(stash);
 }
 
-bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/, bool createMipMaps, int intraCharPadding){
+bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDimension /*has to be powerfOfTwo!*/,
+						 bool createMipMaps, int intraCharPadding, float dpiScale_){
 	
 	if (stash == NULL){
+		dpiScale = dpiScale_;
 		extraPadding = intraCharPadding;
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(texDimension);
-		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding);
+		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding, dpiScale);
 		stash->doKerning = 0; //kerning disabled by default
+		stash->charSpacing = 0.0; //spacing neutral by default
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
 			ofLogVerbose("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
@@ -111,7 +114,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text( stash, stashFontID, size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
+				sth_draw_text( stash, stashFontID, size, 0.0f, dpiScale * size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line , s.c_str(), &dx );
 				line ++;
 			}
 			sth_end_draw(stash);
@@ -221,7 +224,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 				drawBatch(splitLines[i], size, 0, 0 );
 				ofPopMatrix();
 			}
-			#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
+			#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 			totalArea = totalArea.getUnion( getBBox(splitLines[i], size, x, y + yy));
 			#else
 			totalArea = getBBox(splitLines[i], size, x, y + yy); //TODO!
@@ -261,13 +264,22 @@ void ofxFontStash::endBatch(){
 	}
 }
 
+void ofxFontStash::setLodBias(float bias){
+	if(stash != NULL){
+		set_lod_bias(stash, bias);
+	}
+}
+
 void ofxFontStash::drawBatch( string text, float size, float x, float y){
 	if (stash != NULL){
 		if(batchDrawing){
 			float dx = 0;
+			ofPushMatrix();
 			sth_begin_draw(stash);
-			sth_draw_text( stash, stashFontID, size, x, y, text.c_str(), &dx ); //this might draw
+			ofTranslate(x, y);
+			sth_draw_text( stash, stashFontID, size, 0, 0, text.c_str(), &dx ); //this might draw
 			sth_end_draw(stash); // this actually draws
+			ofPopMatrix();
 		}else{
 			ofLogError("ofxFontStash", "can't drawBatch() without calling beginBatch() first!");
 		}
@@ -344,7 +356,7 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		while ( getline(ss, s, '\n') ) {
 			float dx = 0;
 			float w, h, x, y;
-			sth_dim_text( stash, stashFontID, size, s.c_str(), &x, &y, &w, &h);
+			sth_dim_text( stash, stashFontID, size / dpiScale, s.c_str(), &x, &y, &w, &h);
 			totalArea.x = x + xx;
 			totalArea.y = yy + y ;
 			w = fabs (w - x);

@@ -13,11 +13,16 @@ void ofApp::setup(){
 					  1.0,					//lineheight percent
 					  1024,					//texture atlas dimension
 					  true,					//create mipmaps of the font, useful to scale down the font at smaller sizes
-					  8						//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+					  8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
+					  2.0f					//dpi scaleup, render textures @2x the reso
 					  );					//lower res mipmaps wil bleed into each other
 
 }
 
+void ofApp::update(){
+	//you can set a mipmap bias for fonts for which you created mipmaps
+	unicodeFont.setLodBias(ofMap(ofGetMouseX(), 0, ofGetWidth(), -1, 1));
+}
 
 //--------------------------------------------------------------
 void ofApp::draw(){
@@ -34,7 +39,7 @@ void ofApp::draw(){
 	// simple demo //////////////////////////////////////////////////////////
 	
 	drawPoint(x, y);		//draw insertion point	
-	
+
 	ofSetColor(255);
 	TIME_SAMPLE_START("simple draw");
 	font.draw(
@@ -44,16 +49,17 @@ void ofApp::draw(){
 				  y			//y coord where to draw
 			  );
 	TIME_SAMPLE_STOP("simple draw");
-	
+
 	// bounding box demo ///////////////////////////////////////////////////
-	
+	ofRectangle bbox;
+	ofRectangle bboxMultiline;
+
 	ofSetColor(255, 0, 0, 32);
 	TIME_SAMPLE_START("bbox");
-	ofRectangle bbox = font.getBBox( demoText, fontSize, x, y);
+	bbox = font.getBBox( demoText, fontSize, x, y);
 	TIME_SAMPLE_STOP("bbox");
 	ofRect( bbox );
-		
-	
+
 	// draw multiline text /////////////////////////////////////////////////
 	
 	y += 25 + bbox.height;
@@ -72,7 +78,7 @@ void ofApp::draw(){
 
 	ofSetColor(0, 255, 0, 32);
 	TIME_SAMPLE_START("getBoundingBoxSize");
-	ofRectangle bboxMultiline = unicodeFont.getBBox( s, fontSize, x, y);
+	bboxMultiline = unicodeFont.getBBox( s, fontSize, x, y);
 	TIME_SAMPLE_STOP("getBoundingBoxSize");
 	ofRect( bboxMultiline );
 
@@ -86,21 +92,23 @@ void ofApp::draw(){
 	s = "And you can wrap text to a certain (mouseX) width:\n\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.";
 	//s = "international bananas";
 
-	TIME_SAMPLE_START("drawMultiLineColumn");
 	int numLines = 0;
 	bool wordsWereCropped;
-	ofRectangle column = font.drawMultiLineColumn(	s,			/*string*/
-													fontSize,	/*size*/
-													x, y,		/*where*/
-													MAX( 10 ,mouseX - x), /*column width*/
-													numLines,	/*get back the number of lines*/
-													false,		/* if true, we wont draw (just get bbox back) */
-													5,			/* max number of lines to draw, crop after that */
-													true,		/*get the final text formatting (by adding \n's) in the supplied string;
-																 BE ARWARE that using TRUE in here will modify your supplied string! */
-													&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
-												 );
+	ofRectangle column;
+	TIME_SAMPLE_START("drawMultiLineColumn");
+	column = font.drawMultiLineColumn(	s,			/*string*/
+										fontSize,	/*size*/
+										x, y,		/*where*/
+										MAX( 10 ,mouseX - x), /*column width*/
+										numLines,	/*get back the number of lines*/
+										false,		/* if true, we wont draw (just get bbox back) */
+										5,			/* max number of lines to draw, crop after that */
+										true,		/*get the final text formatting (by adding \n's) in the supplied string;
+													 BE ARWARE that using TRUE in here will modify your supplied string! */
+										&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
+									 );
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
+
 
 	//report if some words had to be cropped to fit in the column when using drawMultiLineColumn()
 	if(!wordsWereCropped) ofSetColor(255,32);
