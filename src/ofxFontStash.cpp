@@ -420,7 +420,7 @@ int ofxFontStash::getSize(){
 }
 
 float ofxFontStash::getLineHeight(){
-    return lineHeight * fontSize;
+    return lineHeight;
 }
 
 float ofxFontStash::getSpaceSize(){
