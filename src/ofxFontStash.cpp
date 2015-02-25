@@ -316,7 +316,12 @@ string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr en
 	string finalLine = "";
 	ofUTF8Ptr i = begin;
 	while (i < iter) { // re-fill the finalLine from the begining to the last Space
-		finalLine += ofTextConverter::toUTF8(ofUTF8::getNext(i)); // get the next unichar and iterate
+        // Ignore any spaces at the beginning of the line
+        ofUniChar c = ofUTF8::getNext(i);
+        if (finalLine.empty() && ofUnicode::isSpace(c))
+            continue;
+
+		finalLine += ofTextConverter::toUTF8(c); // get the next unichar and iterate
 		if(i == end){
 			break;
 		}
