@@ -9,6 +9,7 @@ void ofApp::setup(){
 	ofBackground(22, 22, 22, 255);
 
 	font.setup("Vera.ttf");
+	font.addFont("VeraMono-Bold.ttf");
 	unicodeFont.setup("Arial Unicode.ttf", //font file, ttf only
 					  1.0,					//lineheight percent
 					  1024,					//texture atlas dimension
@@ -130,6 +131,19 @@ void ofApp::draw(){
 	font.endBatch();		//call "end" once finished
 	TIME_SAMPLE_STOP("drawBatch");
 
+	// formatted text //////////////////////////////////////////////////////
+
+	string formattedText = "the #0xff0000 @1 %2.0 red %1.0 #0xffffff @0 apple is on the big %4.0 #0x00ff00 tree.";
+
+	ofPushMatrix();
+	ofTranslate(20,500);
+	ofSetColor(255);
+	ofVec2f size = font.drawMultiColumnFormatted(formattedText, 22, mouseX);
+	ofSetColor(255,10);
+	ofRect(0, 0, size.x, size.y);
+	ofPopMatrix();
+
+
 	// rotating text ///////////////////////////////////////////////////////
 	
 	ofPushMatrix();
@@ -140,7 +154,7 @@ void ofApp::draw(){
 		drawPoint(0,0);
 	ofPopMatrix();
 
-	// scaling text with mipmaps ///////////////////////////////////////////////////////
+	// scaling text with mipmaps ///////////////////////////////////////////
 
 	ofPushMatrix();
 	ofTranslate(600, 40);
