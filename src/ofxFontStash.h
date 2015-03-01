@@ -83,26 +83,28 @@ class ofxFontStash{
 											bool * wordsWereTruncated = NULL );
 
 /**
-		 using the drawMultiColumnFormatted() function:
-		 add one of the following as a single word to change text font and color.
+		drawMultiColumnFormatted() how to use:
+		add one of the following as a single word to change text font and color.
 
 		@id
 			to change font id -
 			@0 is the first font you setup fontstash with.
 			@1 is the second font you addedd with addFont()
 
-		 #0x000000
+		#0x000000
 			to change font color, in hex
 
-		 %scale
+		%scale
 			scale size
 			%1 will draw at the specified "size"
 			%3.3 will draw at 330% the "size"
 
-		 example 1: "this is a #0x0000ff blue 0x000000 color"
-		 example 2: "this is the @1 second @0 font, and this is the @2 third @0 font."
-		 example 3: "the #0xff0000 red #0x000000 apple is on the @1 big @0 tree."
-		 example 4: "this is %2.2 more than double %1 the size"
+		>> be aware, a dpiScale !=1.0 wont work with this method.
+ 
+		example 1: "this is a #0x0000ff blue 0x000000 color"
+		example 2: "this is the @1 second @0 font, and this is the @2 third @0 font."
+		example 3: "the #0xff0000 red #0x000000 apple is on the @1 big @0 tree."
+		example 4: "this is %2.2 more than double %1 the size"
 **/
 
 		ofVec2f drawMultiColumnFormatted(const string &text, float size, float columnWidth, bool topLeftAlign = false, bool dryrun = false);

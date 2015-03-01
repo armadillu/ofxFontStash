@@ -200,12 +200,10 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 					
 				}else{
 					if (foundSpace){
-						//cout << "## foundSpace! (" << thisLine << ")" << endl;
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
 						iter = lastSpace;
 					}else{
-						//cout << "## no Space! (" << thisLine << ")" << endl;
 						splitLines.push_back(thisLine);
 						if(wordsWereTruncated){
 							*wordsWereTruncated = true;
@@ -281,6 +279,11 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 		return ofVec2f(0,0);
 	}
 
+	//TODO hack!
+	//this is to fix the issue where two consecutive \n\n's are ignored
+	string localText = text;
+	ofStringReplace(localText, "\n", " \n");
+
 	vector<std::string> allWords;
 	vector<ofVec2f> wordSizes;
 	vector<int> wordFonts;
@@ -293,7 +296,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 
 	// first, calculate the sizes of all the words
 	//
-	vector<std::string> lines = ofSplitString(text, "\n");
+	vector<std::string> lines = ofSplitString(localText, "\n");
 	for (int i=0; i<lines.size(); i++) {
 
 		vector<std::string> words = ofSplitString(lines[i], " ");
@@ -326,7 +329,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 			}
 
 			float x, y, w, h;
-			sth_dim_text( stash, currentFontId, size*currentScale, word.c_str(), &x, &y, &w, &h);
+			sth_dim_text( stash, currentFontId, size * currentScale / dpiScale, word.c_str(), &x, &y, &w, &h);
 
 			allWords.push_back(word);
 			wordSizes.push_back(ofVec2f(w, h));
@@ -404,7 +407,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 		ofPopMatrix();
 	}
 
-	return ofVec2f(maxX, drawPointer.y - (lineHeight * size - asc));
+	return ofVec2f(maxX, drawPointer.y - (lineHeight * size / dpiScale - asc));
 }
 
 

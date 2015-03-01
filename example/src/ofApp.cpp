@@ -8,7 +8,7 @@ void ofApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(22, 22, 22, 255);
 
-	font.setup("Vera.ttf");
+	font.setup("Vera.ttf", 1.0, 1024, true, 8, 1.0);
 	font.addFont("VeraMono-Bold.ttf");
 	unicodeFont.setup("Arial Unicode.ttf", //font file, ttf only
 					  1.0,					//lineheight percent
