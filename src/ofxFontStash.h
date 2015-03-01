@@ -42,8 +42,8 @@
 
 extern "C" {
 	#include "fontstash.h"
+	#include "stb_truetype.h"
 }
-
 
 class ofxFontStash{
 
@@ -53,7 +53,7 @@ class ofxFontStash{
 		~ofxFontStash();
 	
 		//call this to set your font file (.ttf, etc)
-		bool setup( string fontFile,
+		bool setup(string firstFontFile,
 				   float lineHeightPercent = 1.0f,
 				   int textureDimension = 512,	//texture atlas size, must be PowerOfTwo (512, 1024, 2048, etc)
 				   bool createMipMaps = false,	//create mipmaps for the texture atlasas; if you do
@@ -65,6 +65,8 @@ class ofxFontStash{
 												//wastes texture space, but makes mipmaps work.
 				   float dpiScale = 1.0f		//character texture is rendered internally at this scale
 				   );
+
+	void addFont(const std::string& fontFile);
 
 		//will draw text in one line, ignoring "\n"'s
 		void draw( string text, float size, float x, float y);
@@ -79,6 +81,10 @@ class ofxFontStash{
 											float columnWidth, int &numLines, bool dontDraw = false,
 											int maxLines = 0, bool giveBackNewLinedText = false,
 											bool * wordsWereTruncated = NULL );
+
+
+		ofVec2f dmc(const string &text, float size, float columnWidth, bool topLeftAlign = false, bool dryrun = false);
+		float getFontHeight(float fontSize);
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
 		ofRectangle getBBox( string text, float size, float x, float y );
@@ -125,11 +131,18 @@ class ofxFontStash{
 		int					extraPadding; //used for mipmaps
 		float				lineHeight; // as percent, 1.0 would be normal
 		struct sth_stash*	stash;
-		int					stashFontID;
+
+		int texDimension;
+		vector<int>			fontIds;
+//		int					stashFontID;
 		bool				batchDrawing;
 
 		//fill in a string
 		string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
+
+	bool isFontCode(const std::string& str) { return str.length()==2 && str[0] == '@'; }
+	bool isColorCode(const std::string& str) { return str.length()==9 && str[0] == '#'; }
+	bool isScaleCode(const std::string& str) { return str[0] == '%'; }
     
         // ofTrueTypeFont parity attributes
         int					fontSize;
