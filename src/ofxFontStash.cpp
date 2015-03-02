@@ -351,7 +351,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 	// now draw the text
 	//
 	ofVec2f drawPointer(0, 0);
-	float asc;
+	float asc = 0.0f;
 
 	if (topLeftAlign) {
 		float desc, lineh;
