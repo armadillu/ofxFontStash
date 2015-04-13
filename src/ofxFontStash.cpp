@@ -131,7 +131,7 @@ void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
 							  fontIds[0],
 							  size,
 							  0.0f,
-							  size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line,
+							  size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale,
 							  s.c_str(),
 							  &dx
 							  );
