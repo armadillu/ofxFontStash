@@ -382,7 +382,7 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		if(line > 1){ //if multiline
 			totalArea.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
-				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
+				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 				totalArea = totalArea.getUnion(rects[i]);	//TODO
 				#endif
 			}
