@@ -183,7 +183,11 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 						//cout << "## foundSpace! (" << thisLine << ")" << endl;
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
-						iter = lastSpace;
+						
+						// Edge case where if max width is met and first character is space
+						if(!ofUnicode::isSpace(ofUTF8::get(lineStart))){
+							iter = lastSpace;
+						}
 					}else{
 						//cout << "## no Space! (" << thisLine << ")" << endl;
 						splitLines.push_back(thisLine);
