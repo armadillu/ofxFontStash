@@ -202,7 +202,11 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 					if (foundSpace){
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
-						iter = lastSpace;
+						
+						// Edge case where if max width is met and first character is space
+						if(!ofUnicode::isSpace(ofUTF8::get(lineStart))){
+							iter = lastSpace;
+						}
 					}else{
 						splitLines.push_back(thisLine);
 						if(wordsWereTruncated){
