@@ -71,7 +71,7 @@ bool ofxFontStash::setup( string fontFile, float lineHeightPercent , int texDime
 		stash->charSpacing = 0.0; //spacing neutral by default
 		stashFontID = sth_add_font( stash, ofToDataPath( fontFile ).c_str() );
 		if ( stashFontID != 0){
-			ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
+			ofLogVerbose("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
 			return true;
 		}else{
 			ofLogError("ofxFontStash", "Can't load font! '%s'", fontFile.c_str() );
@@ -414,6 +414,10 @@ void ofxFontStash::setLineHeight(float percent){
 //--------------------------------------------------------------
 // ofTrueTypeFont parity methods
 bool ofxFontStash::loadFont(string filename, int fsize, float lineHeightPercent, int textureDimension){
+    return load(filename, fsize, lineHeightPercent, textureDimension);
+}
+
+bool ofxFontStash::load(string filename, int fsize, float lineHeightPercent, int textureDimension){
     fontSize = fsize;
     return setup(filename, lineHeightPercent, textureDimension);
 }

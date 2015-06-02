@@ -101,7 +101,8 @@ class ofxFontStash{
 		void setLodBias(float bias); //only makes sense when using mipmaps!
 
         // ofTrueTypeFont parity methods
-        bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
+        bool load(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
+        OF_DEPRECATED_MSG("Use load instead", bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512));
         bool isLoaded();
     
         void setSize(int fontsize);
