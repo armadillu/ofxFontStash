@@ -257,8 +257,10 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		if(giveBackNewLinedText){
 			text = "";
 			for (int i = 0; i < numLines; i++){
-				text += splitLines[i];
-				if (i != numLines-1) text += "\n";
+				if (i < maxLines){
+					text += splitLines[i];
+					if (i != numLines-1) text += "\n";
+				}
 			}
 		}
 
@@ -554,7 +556,7 @@ ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy )
 		if(line > 1){ //if multiline
 			totalArea.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
-				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR == 8
+				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 				totalArea = totalArea.getUnion(rects[i]);	//TODO
 				#endif
 			}
