@@ -96,7 +96,7 @@ void ofxFontStash::addFont(const std::string &fontFile)
 }
 
 
-void ofxFontStash::draw( string text, float size, float x, float y){
+void ofxFontStash::draw( const string& text, float size, float x, float y){
 	
 	if (stash != NULL){
 		float dx = 0;
@@ -113,7 +113,7 @@ void ofxFontStash::draw( string text, float size, float x, float y){
 }
 
 
-void ofxFontStash::drawMultiLine( string text, float size, float x, float y){
+void ofxFontStash::drawMultiLine( const string& text, float size, float x, float y){
 	
 	if (stash != NULL){
 
@@ -202,7 +202,11 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 					if (foundSpace){
 						string finalLine = walkAndFill(lineStart, iter, lastSpace);
 						splitLines.push_back(finalLine);
-						iter = lastSpace;
+						
+						// Edge case where if max width is met and first character is space
+						if(!ofUnicode::isSpace(ofUTF8::get(lineStart))){
+							iter = lastSpace;
+						}
 					}else{
 						splitLines.push_back(thisLine);
 						if(wordsWereTruncated){
@@ -445,7 +449,7 @@ void ofxFontStash::setLodBias(float bias){
 	}
 }
 
-void ofxFontStash::drawBatch( string text, float size, float x, float y){
+void ofxFontStash::drawBatch( const string& text, float size, float x, float y){
 	if (stash != NULL){
 		if(batchDrawing){
 			float dx = 0;
@@ -464,7 +468,7 @@ void ofxFontStash::drawBatch( string text, float size, float x, float y){
 }
 
 
-void ofxFontStash::drawMultiLineBatch( string text, float size, float x, float y ){
+void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, float y ){
 	if (stash != NULL){
 		if(batchDrawing){
 			float dx = 0;
@@ -523,7 +527,7 @@ bool ofxFontStash::getKerning(){
 	return false;
 }
 
-ofRectangle ofxFontStash::getBBox( string text, float size, float xx, float yy ){
+ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy ){
 
 	ofRectangle totalArea;
 

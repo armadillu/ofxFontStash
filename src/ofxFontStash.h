@@ -69,10 +69,10 @@ class ofxFontStash{
 	void addFont(const std::string& fontFile);
 
 		//will draw text in one line, ignoring "\n"'s
-		void draw( string text, float size, float x, float y);
+		void draw( const string& text, float size, float x, float y);
 
 		//text with "\n" will produce line breaks
-		void drawMultiLine( string text, float fontSize, float x, float y );
+		void drawMultiLine( const string& text, float fontSize, float x, float y );
 
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
@@ -113,14 +113,14 @@ class ofxFontStash{
 		float getFontHeight(float fontSize);
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
-		ofRectangle getBBox( string text, float size, float x, float y );
-		ofRectangle getBBox( string text, float size, float x, float y, float columnWidth );
+		ofRectangle getBBox( const string& text, float size, float x, float y );
+		ofRectangle getBBox( const string& text, float size, float x, float y, float columnWidth );
 
 
 		//interleave drawBatch* calls between begin() and end()
 		void beginBatch();
-		void drawBatch( string text, float size, float x, float y);
-		void drawMultiLineBatch( string text, float size, float x, float y );
+		void drawBatch( const string& text, float size, float x, float y);
+		void drawMultiLineBatch( const string& text, float size, float x, float y );
 		void endBatch();
 
 		void setLineHeight(float percent);
