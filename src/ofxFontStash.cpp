@@ -84,9 +84,10 @@ void ofxFontStash::addFont(const std::string &fontFile)
 		return;
 	}
 
-	int fontId = sth_add_font(stash, ofToDataPath(fontFile).c_str());
+	string fontPath = ofToDataPath(fontFile);
+	int fontId = sth_add_font(stash, fontPath.c_str());
 	if (fontId <= 0) {
-		ofLogError("ofxFontStash", "Can't load font! '%s'", fontFile.c_str() );
+		ofLogError("ofxFontStash", "Can't load font! '%s'", fontPath.c_str() );
 		return;
 	}
 
@@ -279,8 +280,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 
 	float maxX=0;
 
-	if (stash == NULL ||
-		fontIds.empty()) {
+	if (stash == NULL || fontIds.empty()) {
 		ofLogError("ofxFontStash::dmc", "error: stash not initialized or no font");
 		return ofVec2f(0,0);
 	}

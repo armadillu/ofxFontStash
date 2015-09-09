@@ -610,7 +610,9 @@ void set_lod_bias(struct sth_stash* stash, float bias){
 		while (texture){
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texture->id);
+#ifndef TARGET_OS_IOS
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
+#endif
 			glBindTexture(GL_TEXTURE_2D, 0);
 			glDisable(GL_TEXTURE_2D);
 			texture = texture->next;
