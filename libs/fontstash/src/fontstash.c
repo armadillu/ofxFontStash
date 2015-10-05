@@ -483,15 +483,13 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 							numTex++;
 							tex = tex->next;
 						}
-						printf("fontStash allocating a new texture of %d x %d (%d used so far)\n", stash->tw,stash->th, numTex );
+						printf("fontStash allocating a new texture of %d x %d (%d used so far)\n", stash->tw, stash->th, numTex );
 						glGenTextures(1, &texture->id);
 						if (!texture->id) goto error;
 						glBindTexture(GL_TEXTURE_2D, texture->id);
 						glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, stash->tw,stash->th, 0, GL_ALPHA, GL_UNSIGNED_BYTE, stash->empty_data);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-						//glGenerateMipmap(GL_TEXTURE_2D);
 					}
 					continue;
 				}

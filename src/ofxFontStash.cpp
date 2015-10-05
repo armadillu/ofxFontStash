@@ -71,7 +71,7 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 		stash->charSpacing = 0.0; //spacing neutral by default
 		addFont(firstFontFile);
 	}else{
-		ofLogError("ofxFontStash", "don't call setup() more than once!");
+		ofLogError("ofxFontStash") << "don't call setup() more than once!";
 	}
 
 	return false;
@@ -80,20 +80,20 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 void ofxFontStash::addFont(const std::string &fontFile)
 {
 	if (stash == NULL) {
-		ofLogError("ofxFontStash::addFont", "error: font stash not initialized, call setup first");
+		ofLogError("ofxFontStash") << "addFont() error: font stash not initialized, call setup first";
 		return;
 	}
 
 	string fontPath = ofToDataPath(fontFile);
 	int fontId = sth_add_font(stash, fontPath.c_str());
 	if (fontId <= 0) {
-		ofLogError("ofxFontStash", "Can't load font! '%s'", fontPath.c_str() );
+		ofLogError("ofxFontStash") << "Can't load font! \"" << fontPath.c_str() << "\"";
 		return;
 	}
 
 	fontIds.push_back(fontId);
 
-	ofLogNotice("ofxFontStash", "loaded font '%s' in texture (%d x %d)", fontFile.c_str(), texDimension, texDimension );
+	ofLogNotice("ofxFontStash") << "loaded font '" << fontFile << "' in texture ("<<texDimension<<" x "<<texDimension<<")";
 }
 
 
@@ -109,7 +109,7 @@ void ofxFontStash::draw( const string& text, float size, float x, float y){
 		sth_end_draw(stash); // this actually draws
 		glPopMatrix();
 	}else{
-		ofLogError("ofxFontStash", "can't draw() without having been setup first!");
+		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
 	}		
 }
 
@@ -142,7 +142,7 @@ void ofxFontStash::drawMultiLine( const string& text, float size, float x, float
 		glPopMatrix();
 
 	}else{
-		ofLogError("ofxFontStash", "can't drawMultiLine() without having been setup first!");
+		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
 	}		
 }
 
@@ -270,7 +270,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		}
 
 	}else{
-		ofLogError("ofxFontStash", "can't drawMultiLine() without having been setup first!");
+		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
 	}
 	return totalArea;
 }
@@ -281,7 +281,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 	float maxX=0;
 
 	if (stash == NULL || fontIds.empty()) {
-		ofLogError("ofxFontStash::dmc", "error: stash not initialized or no font");
+		ofLogError("ofxFontStash") << "error: stash not initialized or no font";
 		return ofVec2f(0,0);
 	}
 
@@ -460,10 +460,10 @@ void ofxFontStash::drawBatch( const string& text, float size, float x, float y){
 			sth_end_draw(stash); // this actually draws
 			ofPopMatrix();
 		}else{
-			ofLogError("ofxFontStash", "can't drawBatch() without calling beginBatch() first!");
+			ofLogError("ofxFontStash") <<"can't drawBatch() without calling beginBatch() first!";
 		}
 	}else{
-		ofLogError("ofxFontStash", "can't drawBatch() without having been setup first!");
+		ofLogError("ofxFontStash") << "can't drawBatch() without having been setup first!";
 	}
 }
 
@@ -482,10 +482,10 @@ void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, 
 				line ++;
 			}
 		}else{
-			ofLogError("ofxFontStash", "can't drawMultiLineBatch() without calling beginBatch() first!");
+			ofLogError("ofxFontStash") <<"can't drawBatch() without calling beginBatch() first!";
 		}
 	}else{
-		ofLogError("ofxFontStash", "can't drawMultiLineBatch() without having been setup first!");
+		ofLogError("ofxFontStash") << "can't drawBatch() without having been setup first!";
 	}
 }
 
@@ -513,7 +513,7 @@ void ofxFontStash::setKerning(bool enabled){
 	if (stash){
 		stash->doKerning = enabled ? 1 : 0;
 	}else{
-		ofLogError("ofxFontStash", "can't setKerning() without having been setup() first!");
+		ofLogError("ofxFontStash") <<"can't setKerning() without having been setup() first!";
 	}
 }
 
@@ -522,7 +522,7 @@ bool ofxFontStash::getKerning(){
 	if (stash){
 		return stash->doKerning != 0;
 	}else{
-		ofLogError("ofxFontStash", "can't getKerning() without having been setup() first!");
+		ofLogError("ofxFontStash") << "can't getKerning() without having been setup() first!";
 	}
 	return false;
 }
@@ -569,7 +569,7 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 		}
 
 	}else{
-		ofLogError("ofxFontStash", "can't getBoundingBoxSize() without having been setup first!");
+		ofLogError("ofxFontStash") << "can't getBoundingBoxSize() without having been setup first!";
 	}
 
 	if(extraPadding > 0){
