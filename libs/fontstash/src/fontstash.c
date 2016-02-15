@@ -96,51 +96,51 @@ static unsigned int hashint(unsigned int a)
 }
 
 
-struct sth_quad
+struct ofx_sth_quad
 {
 	float x0,y0,s0,t0;
 	float x1,y1,s1,t1;
 };
 
-struct sth_row
+struct ofx_sth_row
 {
 	short x,y,h;
 };
 
-struct sth_glyph
+struct ofx_sth_glyph
 {
 	unsigned int codepoint;
 	short size;
-	struct sth_texture* texture;
+	struct ofx_sth_texture* texture;
 	int x0,y0,x1,y1;
 	float xadv,xoff,yoff;
 	int next;
 };
 
-struct sth_font
+struct ofx_sth_font
 {
 	int idx;
 	int type;
-	stbtt_fontinfo font;
+	ofx_stbtt_fontinfo font;
 	unsigned char* data;
-	struct sth_glyph* glyphs;
+	struct ofx_sth_glyph* glyphs;
 	int lut[HASH_LUT_SIZE];
 	int nglyphs;
 	float ascender;
 	float descender;
 	float lineh;
-	struct sth_font* next;
+	struct ofx_sth_font* next;
 };
 
-struct sth_texture
+struct ofx_sth_texture
 {
 	GLuint id;
 	// TODO: replace rows with pointer
-	struct sth_row rows[MAX_ROWS];
+	struct ofx_sth_row rows[MAX_ROWS];
 	int nrows;
 	float verts[4*VERT_COUNT];
 	int nverts;
-	struct sth_texture* next;
+	struct ofx_sth_texture* next;
 };
 
 
@@ -179,16 +179,16 @@ static unsigned int decutf8(unsigned int* state, unsigned int* codep, unsigned i
 
 
 
-struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int charPadding, float dpiScale){
+struct ofx_sth_stash* ofx_sth_create(int cachew, int cacheh, int createMipmaps, int charPadding, float dpiScale){
 
-	struct sth_stash* stash = NULL;
+	struct ofx_sth_stash* stash = NULL;
 	GLubyte* empty_data = NULL;
-	struct sth_texture* texture = NULL;
+	struct ofx_sth_texture* texture = NULL;
 
 	// Allocate memory for the font stash.
-	stash = (struct sth_stash*)malloc(sizeof(struct sth_stash));
+	stash = (struct ofx_sth_stash*)malloc(sizeof(struct ofx_sth_stash));
 	if (stash == NULL) goto error;
-	memset(stash,0,sizeof(struct sth_stash));
+	memset(stash,0,sizeof(struct ofx_sth_stash));
 
 	// Create data for clearing the textures
 	empty_data = (GLubyte*)	malloc(cachew * cacheh);
@@ -196,9 +196,9 @@ struct sth_stash* sth_create(int cachew, int cacheh, int createMipmaps, int char
 	memset(empty_data, 0, cachew * cacheh);
 
 	// Allocate memory for the first texture
-	texture = (struct sth_texture*)malloc(sizeof(struct sth_texture));
+	texture = (struct ofx_sth_texture*)malloc(sizeof(struct ofx_sth_texture));
 	if (texture == NULL) goto error;
-	memset(texture,0,sizeof(struct sth_texture));
+	memset(texture,0,sizeof(struct ofx_sth_texture));
 
 	// Create first texture for the cache.
 	stash->tw = cachew;
@@ -229,14 +229,14 @@ error:
 	return NULL;
 }
 
-int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer)
+int ofx_sth_add_font_from_memory(struct ofx_sth_stash* stash, unsigned char* buffer)
 {
 	int i, ascent, descent, fh, lineGap;
-	struct sth_font* fnt = NULL;
+	struct ofx_sth_font* fnt = NULL;
 
-	fnt = (struct sth_font*)malloc(sizeof(struct sth_font));
+	fnt = (struct ofx_sth_font*)malloc(sizeof(struct ofx_sth_font));
 	if (fnt == NULL) goto error;
-	memset(fnt,0,sizeof(struct sth_font));
+	memset(fnt,0,sizeof(struct ofx_sth_font));
 
 	// Init hash lookup.
 	for (i = 0; i < HASH_LUT_SIZE; ++i) fnt->lut[i] = -1;
@@ -245,11 +245,11 @@ int sth_add_font_from_memory(struct sth_stash* stash, unsigned char* buffer)
 
 
 	// Init stb_truetype
-	if (!stbtt_InitFont(&fnt->font, fnt->data, 0)) goto error;
+	if (!ofx_stbtt_InitFont(&fnt->font, fnt->data, 0)) goto error;
 	
 	// Store normalized line height. The real line height is got
 	// by multiplying the lineh by font size.
-	stbtt_GetFontVMetrics(&fnt->font, &ascent, &descent, &lineGap);
+	ofx_stbtt_GetFontVMetrics(&fnt->font, &ascent, &descent, &lineGap);
 	fh = ascent - descent;
 	fnt->ascender = (float)ascent / (float)fh;
 	fnt->descender = (float)descent / (float)fh;
@@ -270,7 +270,7 @@ error:
 	return 0;
 }
 
-int sth_add_font(struct sth_stash* stash, const char* path)
+int ofx_sth_add_font(struct ofx_sth_stash* stash, const char* path)
 {
 	FILE* fp = 0;
 	int datasize;
@@ -289,7 +289,7 @@ int sth_add_font(struct sth_stash* stash, const char* path)
 	fclose(fp);
 	fp = 0;
 	
-	idx = sth_add_font_from_memory(stash, data);
+	idx = ofx_sth_add_font_from_memory(stash, data);
 	// Modify type of the loaded font.
 	if (idx)
 		stash->fonts->type = TTFONT_FILE;
@@ -304,14 +304,14 @@ error:
 	return 0;
 }
 
-int sth_add_bitmap_font(struct sth_stash* stash, int ascent, int descent, int line_gap)
+int ofx_sth_add_bitmap_font(struct ofx_sth_stash* stash, int ascent, int descent, int line_gap)
 {
 	int i, fh;
-	struct sth_font* fnt = NULL;
+	struct ofx_sth_font* fnt = NULL;
 
-	fnt = (struct sth_font*)malloc(sizeof(struct sth_font));
+	fnt = (struct ofx_sth_font*)malloc(sizeof(struct ofx_sth_font));
 	if (fnt == NULL) goto error;
-	memset(fnt,0,sizeof(struct sth_font));
+	memset(fnt,0,sizeof(struct ofx_sth_font));
 
 	// Init hash lookup.
 	for (i = 0; i < HASH_LUT_SIZE; ++i) fnt->lut[i] = -1;
@@ -335,7 +335,7 @@ error:
 	return 0;
 }
 
-void sth_add_glyph(struct sth_stash* stash,
+void ofx_sth_add_glyph(struct ofx_sth_stash* stash,
                   int idx,
                   GLuint id,
                   const char* s,
@@ -343,9 +343,9 @@ void sth_add_glyph(struct sth_stash* stash,
                   int x, int y, int w, int h,
                   float xoffset, float yoffset, float xadvance)
 {
-	struct sth_texture* texture = NULL;
-	struct sth_font* fnt = NULL;
-	struct sth_glyph* glyph = NULL;
+	struct ofx_sth_texture* texture = NULL;
+	struct ofx_sth_font* fnt = NULL;
+	struct ofx_sth_glyph* glyph = NULL;
 	unsigned int codepoint;
 	unsigned int state = 0;
 
@@ -355,9 +355,9 @@ void sth_add_glyph(struct sth_stash* stash,
 	if (texture == NULL)
 	{
 		// Create new texture
-		texture = (struct sth_texture*)malloc(sizeof(struct sth_texture));
+		texture = (struct ofx_sth_texture*)malloc(sizeof(struct ofx_sth_texture));
 		if (texture == NULL) return;
-		memset(texture, 0, sizeof(struct sth_texture));
+		memset(texture, 0, sizeof(struct ofx_sth_texture));
 		texture->id = id;
 		texture->next = stash->bm_textures;
 		stash->bm_textures = texture;
@@ -376,12 +376,12 @@ void sth_add_glyph(struct sth_stash* stash,
 
 	// Alloc space for new glyph.
 	fnt->nglyphs++;
-	fnt->glyphs = (struct sth_glyph *)realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct sth_glyph)); /* @rlyeh: explicit cast needed in C++ */
+	fnt->glyphs = (struct ofx_sth_glyph *)realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct ofx_sth_glyph)); /* @rlyeh: explicit cast needed in C++ */
 	if (!fnt->glyphs) return;
 
 	// Init glyph.
 	glyph = &fnt->glyphs[fnt->nglyphs-1];
-	memset(glyph, 0, sizeof(struct sth_glyph));
+	memset(glyph, 0, sizeof(struct ofx_sth_glyph));
 	glyph->codepoint = codepoint;
 	glyph->size = size;
 	glyph->texture = texture;
@@ -400,17 +400,17 @@ void sth_add_glyph(struct sth_stash* stash,
 	fnt->lut[h] = fnt->nglyphs-1;
 }
 
-static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt, unsigned int codepoint, short isize)
+static struct ofx_sth_glyph* get_glyph(struct ofx_sth_stash* stash, struct ofx_sth_font* fnt, unsigned int codepoint, short isize)
 {
 	int i,g,advance,lsb,x0,y0,x1,y1,gw,gh;
 	float scale;
-	struct sth_texture* texture = NULL;
-	struct sth_glyph* glyph = NULL;
+	struct ofx_sth_texture* texture = NULL;
+	struct ofx_sth_glyph* glyph = NULL;
 	unsigned char* bmp = NULL;
 	unsigned int h;
 	float size = isize/10.0f;
 	int rh;
-	struct sth_row* br = NULL;
+	struct ofx_sth_row* br = NULL;
 
 	// Find code point and size.
 	h = hashint(codepoint) & (HASH_LUT_SIZE-1);
@@ -427,11 +427,11 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	if (fnt->type == BMFONT) return 0;
 	
 	// For truetype fonts: create this glyph.
-	scale = stash->dpiScale * stbtt_ScaleForPixelHeight(&fnt->font, size);
-	g = stbtt_FindGlyphIndex(&fnt->font, codepoint);
+	scale = stash->dpiScale * ofx_stbtt_ScaleForPixelHeight(&fnt->font, size);
+	g = ofx_stbtt_FindGlyphIndex(&fnt->font, codepoint);
 	if(!g) return 0; /* @rlyeh: glyph not found, ie, arab chars */
-	stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
-	stbtt_GetGlyphBitmapBox(&fnt->font, g, scale,scale, &x0,&y0,&x1,&y1);
+	ofx_stbtt_GetGlyphHMetrics(&fnt->font, g, &advance, &lsb);
+	ofx_stbtt_GetGlyphBitmapBox(&fnt->font, g, scale,scale, &x0,&y0,&x1,&y1);
 
 	gw = x1-x0 + stash->padding;
 	gh = y1-y0 + stash->padding;
@@ -472,13 +472,13 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 					else
 					{
 						// Create new texture
-						texture->next = (struct sth_texture*)malloc(sizeof(struct sth_texture));
+						texture->next = (struct ofx_sth_texture*)malloc(sizeof(struct ofx_sth_texture));
 						texture = texture->next;
 						if (texture == NULL) goto error;
-						memset(texture,0,sizeof(struct sth_texture));
+						memset(texture,0,sizeof(struct ofx_sth_texture));
 						//oriol counting how many we have created so far!
 						int numTex = 1;
-						struct sth_texture* tex = stash->tt_textures;
+						struct ofx_sth_texture* tex = stash->tt_textures;
 						while (tex->next != NULL) {
 							numTex++;
 							tex = tex->next;
@@ -505,12 +505,12 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	
 	// Alloc space for new glyph.
 	fnt->nglyphs++;
-	fnt->glyphs = (struct sth_glyph *)realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct sth_glyph)); /* @rlyeh: explicit cast needed in C++ */
+	fnt->glyphs = (struct ofx_sth_glyph *)realloc(fnt->glyphs, fnt->nglyphs*sizeof(struct ofx_sth_glyph)); /* @rlyeh: explicit cast needed in C++ */
 	if (!fnt->glyphs) return 0;
 
 	// Init glyph.
 	glyph = &fnt->glyphs[fnt->nglyphs-1];
-	memset(glyph, 0, sizeof(struct sth_glyph));
+	memset(glyph, 0, sizeof(struct ofx_sth_glyph));
 	glyph->codepoint = codepoint;
 	glyph->size = isize;
 	glyph->texture = texture;
@@ -534,7 +534,7 @@ static struct sth_glyph* get_glyph(struct sth_stash* stash, struct sth_font* fnt
 	bmp = (unsigned char*)malloc(gw*gh);
 	if (bmp)
 	{
-		stbtt_MakeGlyphBitmap(&fnt->font, bmp, gw,gh,gw, scale,scale, g);
+		ofx_stbtt_MakeGlyphBitmap(&fnt->font, bmp, gw,gh,gw, scale,scale, g);
 		// Update texture
 		glBindTexture(GL_TEXTURE_2D, texture->id);
 		glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -564,7 +564,7 @@ error:
 	return 0;
 }
 
-static int get_quad(struct sth_stash* stash, struct sth_font* fnt, struct sth_glyph* glyph, short isize, float* x, float* y, struct sth_quad* q)
+static int get_quad(struct ofx_sth_stash* stash, struct ofx_sth_font* fnt, struct ofx_sth_glyph* glyph, short isize, float* x, float* y, struct ofx_sth_quad* q)
 {
 	int rx,ry;
 	float scale = 1.0f ;
@@ -601,9 +601,9 @@ static float* setv(float* v, float x, float y, float s, float t)
 }
 
 
-void set_lod_bias(struct sth_stash* stash, float bias){
+void set_lod_bias(struct ofx_sth_stash* stash, float bias){
 
-	struct sth_texture* texture = stash->tt_textures;
+	struct ofx_sth_texture* texture = stash->tt_textures;
 	if(stash->hasMipMap > 0){
 		while (texture){
 			glEnable(GL_TEXTURE_2D);
@@ -618,9 +618,9 @@ void set_lod_bias(struct sth_stash* stash, float bias){
 	}
 }
 
-static void flush_draw(struct sth_stash* stash)
+static void flush_draw(struct ofx_sth_stash* stash)
 {
-	struct sth_texture* texture = stash->tt_textures;
+	struct ofx_sth_texture* texture = stash->tt_textures;
 	short tt = 1;
 	while (texture)
 	{
@@ -651,7 +651,7 @@ static void flush_draw(struct sth_stash* stash)
 	}
 }
 
-void sth_begin_draw(struct sth_stash* stash)
+void ofx_sth_begin_draw(struct ofx_sth_stash* stash)
 {
 	if (stash == NULL) return;
 	if (stash->drawing)
@@ -659,7 +659,7 @@ void sth_begin_draw(struct sth_stash* stash)
 	stash->drawing = 1;
 }
 
-void sth_end_draw(struct sth_stash* stash)
+void ofx_sth_end_draw(struct ofx_sth_stash* stash)
 {
 	if (stash == NULL) return;
 	if (!stash->drawing) return;
@@ -687,19 +687,19 @@ void sth_end_draw(struct sth_stash* stash)
 	stash->drawing = 0;
 }
 
-void sth_draw_text(struct sth_stash* stash,
+void ofx_sth_draw_text(struct ofx_sth_stash* stash,
 				   int idx, float size,
 				   float x, float y,
 				   const char* s, float* dx)
 {
 	unsigned int codepoint;
-	struct sth_glyph* glyph = NULL;
-	struct sth_texture* texture = NULL;
+	struct ofx_sth_glyph* glyph = NULL;
+	struct ofx_sth_texture* texture = NULL;
 	unsigned int state = 0;
-	struct sth_quad q;
+	struct ofx_sth_quad q;
 	short isize = (short)(size*10.0f);
 	float* v;
-	struct sth_font* fnt = NULL;
+	struct ofx_sth_font* fnt = NULL;
 	
 	if (stash == NULL) return;
 
@@ -709,7 +709,7 @@ void sth_draw_text(struct sth_stash* stash,
 	if (fnt->type != BMFONT && !fnt->data) return;
 
 	int len = strlen(s);
-	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
+	float scale = ofx_stbtt_ScaleForPixelHeight(&fnt->font, size);
 	int c = 0;
 	float spacing = stash->charSpacing;
 	int doKerning = stash->doKerning;
@@ -729,7 +729,7 @@ void sth_draw_text(struct sth_stash* stash,
 
 		int diff = 0;
 		if (c < len && doKerning > 0){
-			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
+			diff = ofx_stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
 			x += diff * scale;
 		}
@@ -752,17 +752,17 @@ void sth_draw_text(struct sth_stash* stash,
 	if (dx) *dx = x;
 }
 
-void sth_dim_text(struct sth_stash* stash,
+void ofx_sth_dim_text(struct ofx_sth_stash* stash,
 				  int idx, float size,
 				  const char* s,
 				  float* minx, float* miny, float* maxx, float* maxy)
 {
 	unsigned int codepoint;
-	struct sth_glyph* glyph = NULL;
+	struct ofx_sth_glyph* glyph = NULL;
 	unsigned int state = 0;
-	struct sth_quad q;
+	struct ofx_sth_quad q;
 	short isize = (short)(size*10.0f);
-	struct sth_font* fnt = NULL;
+	struct ofx_sth_font* fnt = NULL;
 	float x = 0, y = 0;
 
 	*minx = *maxx = *miny = *maxy = 0;	/* @rlyeh: reset vars before failing */
@@ -774,7 +774,7 @@ void sth_dim_text(struct sth_stash* stash,
 	if (fnt->type != BMFONT && !fnt->data) return;
 
 	int len = strlen(s);
-	float scale = stbtt_ScaleForPixelHeight(&fnt->font, size);
+	float scale = ofx_stbtt_ScaleForPixelHeight(&fnt->font, size);
 	int c = 0;
 	float spacing = stash->charSpacing;
 	int doKerning = stash->doKerning;
@@ -787,7 +787,7 @@ void sth_dim_text(struct sth_stash* stash,
 
 		int diff = 0;
 		if (c < len && doKerning > 0){
-			diff = stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
+			diff = ofx_stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
 			x += diff * scale + spacing;
 		}
@@ -802,11 +802,11 @@ void sth_dim_text(struct sth_stash* stash,
 	if (floorf(x) > *maxx) *maxx = floorf(x);
 }
 
-void sth_vmetrics(struct sth_stash* stash,
+void ofx_sth_vmetrics(struct ofx_sth_stash* stash,
 				  int idx, float size,
 				  float* ascender, float* descender, float* lineh)
 {
-	struct sth_font* fnt = NULL;
+	struct ofx_sth_font* fnt = NULL;
 
 	if (stash == NULL) return;
 	fnt = stash->fonts;
@@ -821,12 +821,12 @@ void sth_vmetrics(struct sth_stash* stash,
 		*lineh = fnt->lineh*size;
 }
 
-void sth_delete(struct sth_stash* stash)
+void ofx_sth_delete(struct ofx_sth_stash* stash)
 {
-	struct sth_texture* tex = NULL;
-	struct sth_texture* curtex = NULL;
-	struct sth_font* fnt = NULL;
-	struct sth_font* curfnt = NULL;
+	struct ofx_sth_texture* tex = NULL;
+	struct ofx_sth_texture* curtex = NULL;
+	struct ofx_sth_font* fnt = NULL;
+	struct ofx_sth_font* curfnt = NULL;
 
 	if (!stash) return;
 

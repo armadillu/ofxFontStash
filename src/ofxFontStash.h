@@ -130,7 +130,7 @@ class ofxFontStash{
 		void setKerning(bool enabled); //use ttf supplied kerning info at draw time or not
 		bool getKerning();
 
-		sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
+		ofx_sth_stash* getStash(){return stash;}; //you probably dont need to mess with that
 		float getDpiScale(){return dpiScale;}
 		void setLodBias(float bias); //only makes sense when using mipmaps!
 
@@ -158,7 +158,7 @@ class ofxFontStash{
 
 		int					extraPadding; //used for mipmaps
 		float				lineHeight; // as percent, 1.0 would be normal
-		struct sth_stash*	stash;
+		struct ofx_sth_stash*	stash;
 
 		int texDimension;
 		vector<int>			fontIds;

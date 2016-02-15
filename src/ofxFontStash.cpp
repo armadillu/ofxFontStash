@@ -55,7 +55,7 @@ ofxFontStash::ofxFontStash(){
 }
 
 ofxFontStash::~ofxFontStash(){
-	if(stash != NULL) sth_delete(stash);
+	if(stash != NULL) ofx_sth_delete(stash);
 }
 
 bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _texDimension /*has to be powerfOfTwo!*/,
@@ -66,7 +66,7 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 		extraPadding = intraCharPadding;
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(_texDimension);
-		stash = sth_create(texDimension,texDimension, createMipMaps, intraCharPadding, dpiScale);
+		stash = ofx_sth_create(texDimension,texDimension, createMipMaps, intraCharPadding, dpiScale);
 		stash->doKerning = 0; //kerning disabled by default
 		stash->charSpacing = 0.0; //spacing neutral by default
 		addFont(firstFontFile);
@@ -85,7 +85,7 @@ void ofxFontStash::addFont(const std::string &fontFile)
 	}
 
 	string fontPath = ofToDataPath(fontFile);
-	int fontId = sth_add_font(stash, fontPath.c_str());
+	int fontId = ofx_sth_add_font(stash, fontPath.c_str());
 	if (fontId <= 0) {
 		ofLogError("ofxFontStash") << "Can't load font! \"" << fontPath.c_str() << "\"";
 		return;
@@ -104,9 +104,9 @@ void ofxFontStash::draw( const string& text, float size, float x, float y){
 		
 		glPushMatrix();
 		glTranslatef(x, y, 0.0);
-		sth_begin_draw(stash);
-		sth_draw_text( stash, fontIds[0], size, 0, 0 , text.c_str(), &dx ); //this might draw
-		sth_end_draw(stash); // this actually draws
+		ofx_sth_begin_draw(stash);
+		ofx_sth_draw_text( stash, fontIds[0], size, 0, 0 , text.c_str(), &dx ); //this might draw
+		ofx_sth_end_draw(stash); // this actually draws
 		glPopMatrix();
 	}else{
 		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
@@ -120,7 +120,7 @@ void ofxFontStash::drawMultiLine( const string& text, float size, float x, float
 
 		glPushMatrix();
 			glTranslatef(x, y, 0.0f);
-			sth_begin_draw(stash);
+			ofx_sth_begin_draw(stash);
 			
 			stringstream ss(text);
 			string s;
@@ -128,7 +128,7 @@ void ofxFontStash::drawMultiLine( const string& text, float size, float x, float
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text(stash,
+				ofx_sth_draw_text(stash,
 							  fontIds[0],
 							  size,
 							  0.0f,
@@ -138,7 +138,7 @@ void ofxFontStash::drawMultiLine( const string& text, float size, float x, float
 							  );
 				line ++;
 			}
-			sth_end_draw(stash);
+			ofx_sth_end_draw(stash);
 		glPopMatrix();
 
 	}else{
@@ -335,7 +335,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 			}
 
 			float x, y, w, h;
-			sth_dim_text( stash, currentFontId, size * currentScale / dpiScale, word.c_str(), &x, &y, &w, &h);
+			ofx_sth_dim_text( stash, currentFontId, size * currentScale / dpiScale, word.c_str(), &x, &y, &w, &h);
 
 			allWords.push_back(word);
 			wordSizes.push_back(ofVec2f(w, h));
@@ -361,14 +361,14 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 
 	if (topLeftAlign) {
 		float desc, lineh;
-		sth_vmetrics(stash, wordFonts[0], size, &asc, &desc, &lineh);
+		ofx_sth_vmetrics(stash, wordFonts[0], size, &asc, &desc, &lineh);
 
 		ofPushMatrix();
 		ofTranslate(0, asc);
 	}
 
 	if (!dryrun) {
-		sth_begin_draw(stash);
+		ofx_sth_begin_draw(stash);
 	}
 
 	for (int i=0; i<allWords.size(); i++) {
@@ -386,8 +386,8 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 		// we need to flush the vertices if we change the color
 		if (!dryrun) {
 			if (wordColors[i] != ofGetStyle().color) {
-				sth_end_draw(stash);
-				sth_begin_draw(stash);
+				ofx_sth_end_draw(stash);
+				ofx_sth_begin_draw(stash);
 
 				ofSetColor(wordColors[i]);
 			}
@@ -395,7 +395,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 
 		float dx = 0;
 		if (!dryrun) {
-			sth_draw_text( stash, wordFonts[i], size * wordScales[i], drawPointer.x, drawPointer.y, allWords[i].c_str(), &dx );
+			ofx_sth_draw_text( stash, wordFonts[i], size * wordScales[i], drawPointer.x, drawPointer.y, allWords[i].c_str(), &dx );
 		}
 		drawPointer.x += wordSizes[i].x;
 
@@ -406,7 +406,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, f
 	}
 
 	if (!dryrun) {
-		sth_end_draw(stash);
+		ofx_sth_end_draw(stash);
 	}
 
 	if (topLeftAlign) {
@@ -421,7 +421,7 @@ float ofxFontStash::getFontHeight(float fontSize)
 {
 	float asc, desc, lineh;
 
-	sth_vmetrics(stash, fontIds[0], fontSize, &asc, &desc, &lineh);
+	ofx_sth_vmetrics(stash, fontIds[0], fontSize, &asc, &desc, &lineh);
 
 	return asc - desc;
 }
@@ -432,14 +432,14 @@ float ofxFontStash::getFontHeight(float fontSize)
 void ofxFontStash::beginBatch(){
 	if(stash != NULL){
 		batchDrawing = true;
-		sth_begin_draw(stash);
+		ofx_sth_begin_draw(stash);
 	}
 }
 
 void ofxFontStash::endBatch(){
 	if(stash != NULL){
 		batchDrawing = false;
-		sth_end_draw(stash);
+		ofx_sth_end_draw(stash);
 	}
 }
 
@@ -454,10 +454,10 @@ void ofxFontStash::drawBatch( const string& text, float size, float x, float y){
 		if(batchDrawing){
 			float dx = 0;
 			ofPushMatrix();
-			sth_begin_draw(stash);
+			ofx_sth_begin_draw(stash);
 			ofTranslate(x, y);
-			sth_draw_text( stash, fontIds[0], size, 0, 0, text.c_str(), &dx ); //this might draw
-			sth_end_draw(stash); // this actually draws
+			ofx_sth_draw_text( stash, fontIds[0], size, 0, 0, text.c_str(), &dx ); //this might draw
+			ofx_sth_end_draw(stash); // this actually draws
 			ofPopMatrix();
 		}else{
 			ofLogError("ofxFontStash") <<"can't drawBatch() without calling beginBatch() first!";
@@ -478,7 +478,7 @@ void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, 
 			while ( getline(ss, s, '\n') ) {
 				//cout << s << endl;
 				float dx = 0;
-				sth_draw_text( stash, fontIds[0], size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
+				ofx_sth_draw_text( stash, fontIds[0], size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
 				line ++;
 			}
 		}else{
@@ -541,7 +541,7 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 			float dx = 0;
 			float w, h, x, y;
 
-			sth_dim_text( stash, fontIds[0], size / dpiScale, s.c_str(), &x, &y, &w, &h);
+			ofx_sth_dim_text( stash, fontIds[0], size / dpiScale, s.c_str(), &x, &y, &w, &h);
 			totalArea.x = x + xx;
 			totalArea.y = yy + y ;
 			w = fabs (w - x);
