@@ -262,7 +262,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		if(giveBackNewLinedText){
 			text = "";
 			for (int i = 0; i < numLines; i++){
-				if (i < maxLines){
+				if (i < maxLines || maxLines == 0){
 					text += splitLines[i];
 					if (i != numLines-1) text += "\n";
 				}
