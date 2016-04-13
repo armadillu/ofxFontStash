@@ -37,8 +37,9 @@
 #define OFX_FONT_STASH_LINE_HEIGHT_MULT	0.9
 
 #include "ofMain.h"
-#include "ofUTF8.h"
-#include "ofTextConverter.h"
+#include "ofxUnicode.h"
+//#include "ofUTF8.h"
+//#include "ofTextConverter.h"
 
 extern "C" {
 	#include "fontstash.h"
@@ -166,7 +167,9 @@ class ofxFontStash{
 		bool				batchDrawing;
 
 		//fill in a string
-		string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
+		string walkAndFill(utf8::iterator<std::string::const_iterator> begin,
+						   utf8::iterator<std::string::const_iterator> & iter,
+						   utf8::iterator<std::string::const_iterator> end);
 
 		bool isFontCode(const std::string& str) { return str.length()==2 && str[0] == '@'; }
 		bool isColorCode(const std::string& str) { return str.length()==9 && str[0] == '#'; }

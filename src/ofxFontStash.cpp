@@ -170,25 +170,30 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		ofRectangle r;
 
 		//ofUTF8Ptr start = ofUTF8::beginPtr(text);
-		ofUTF8Ptr iter = ofUTF8::beginPtr(text);
-		ofUTF8Ptr lineStart = iter;
-		ofUTF8Ptr lastSpace;
-        ofUTF8Ptr stop = ofUTF8::endPtr(text);
+		ofUTF8Iterator iterator = ofUTF8Iterator(text);
+		utf8::iterator<std::string::const_iterator> iter = iterator.begin();
+		utf8::iterator<std::string::const_iterator> lineStart = iter;
+		utf8::iterator<std::string::const_iterator> lastSpace = lineStart;
+		utf8::iterator<std::string::const_iterator> stop = iterator.end(); 
 
         string thisLine = "";
 		bool foundSpace = false;
 		bool foundNewLine = false;
-        while(iter < stop) {
 
-			ofUniChar c = ofUTF8::getNext(iter); // get the next unichar and iterate
-			if ( ofUnicode::isSpace(c) ){
+		while(iter != stop) {
+
+			string thisChar = ofx::TextConverter::toUTF8(*iter);
+			cout << thisChar << endl;
+			++iter;
+
+			if ( thisChar == " " ){
 				foundSpace = true;
 				lastSpace = iter;
 			}
-			if ( ofTextConverter::toUTF8(c) == "\n" ){
+			if ( thisChar == "\n" ){
 				foundNewLine = true;
 			}
-            thisLine += ofTextConverter::toUTF8(c);
+            thisLine += thisChar;
 			r = getBBox(thisLine.c_str(), size, 0,0);
 			if ( r.width > maxW || foundNewLine ) { //we went too far, lets jump back to our closest space
 				if(foundNewLine){
@@ -205,7 +210,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 						splitLines.push_back(finalLine);
 						
 						// Edge case where if max width is met and first character is space
-						if(!ofUnicode::isSpace(ofUTF8::get(lineStart))){
+						if( ofx::TextConverter::toUTF8(*lineStart) != " "){
 							iter = lastSpace;
 						}
 					}else{
@@ -490,20 +495,27 @@ void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, 
 }
 
 
-string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
+string ofxFontStash::walkAndFill(utf8::iterator<std::string::const_iterator> begin,
+								 utf8::iterator<std::string::const_iterator> & iter,
+								 utf8::iterator<std::string::const_iterator> end){
 
 	string finalLine = "";
-	ofUTF8Ptr i = begin;
-	while (i < iter) { // re-fill the finalLine from the begining to the last Space
-        // Ignore any spaces at the beginning of the line
-        ofUniChar c = ofUTF8::getNext(i);
-        if (finalLine.empty() && ofUnicode::isSpace(c))
-            continue;
 
-		finalLine += ofTextConverter::toUTF8(c); // get the next unichar and iterate
-		if(i == end){
+	utf8::iterator<std::string::const_iterator> walker = begin;
+
+	while (walker != iter) { // re-fill the finalLine from the begining to the last Space
+        // Ignore any spaces at the beginning of the line
+		string thisChar = ofx::TextConverter::toUTF8(*walker);
+		walker++;
+		if (finalLine.empty() && thisChar == " "){
+            continue;
+		}
+
+		finalLine += thisChar; // get the next unichar and iterate
+		if(walker == end){
 			break;
 		}
+
 	}
 	return finalLine;
 }
