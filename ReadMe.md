@@ -17,7 +17,7 @@ Main Features:
 
 I made tiny modifications to FontStash to render text flipped vertically, to play nicer in the OpenFrameworks universe in general. It will also report every time a new texture is created. Other modifications have been made to support mipmaps, character spacing, kerning, and retina support.
 
-ofxFontStash supports basic one-line text drawing, lineHeight, multiline text rendering based on '\n', and also word wraping to draw a paragraph constrained to a certain width. It also offers bbox calculations on all the drawing options. It requires [ofxUnicode](http://github.com/bakercp/ofxUnicode).
+ofxFontStash supports basic one-line text drawing, lineHeight, multiline text rendering based on '\n', and also word wraping to draw a paragraph constrained to a certain width. It also offers bbox calculations on all the drawing options. It requires a particular branch of [ofxUnicode](https://github.com/local-projects/ofxUnicode/tree/ofxFontStash).
 
 I made some further modifications to fontstash to allow the creation of mipmaps, and to enable the use of the font-specified kerning information, so spacing between character pairs is shown as its designer intended.
 

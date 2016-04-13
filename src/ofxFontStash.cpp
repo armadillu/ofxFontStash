@@ -181,7 +181,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
         while(iter < stop) {
 
 			ofUniChar c = ofUTF8::getNext(iter); // get the next unichar and iterate
-			if ( ofUnicode::isSpace(c) ){
+			if ( ofxUnicode::isSpace(c) ){
 				foundSpace = true;
 				lastSpace = iter;
 			}
@@ -205,7 +205,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 						splitLines.push_back(finalLine);
 						
 						// Edge case where if max width is met and first character is space
-						if(!ofUnicode::isSpace(ofUTF8::get(lineStart))){
+						if(!ofxUnicode::isSpace(ofUTF8::get(lineStart))){
 							iter = lastSpace;
 						}
 					}else{
@@ -497,7 +497,7 @@ string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr en
 	while (i < iter) { // re-fill the finalLine from the begining to the last Space
         // Ignore any spaces at the beginning of the line
         ofUniChar c = ofUTF8::getNext(i);
-        if (finalLine.empty() && ofUnicode::isSpace(c))
+        if (finalLine.empty() && ofxUnicode::isSpace(c))
             continue;
 
 		finalLine += ofTextConverter::toUTF8(c); // get the next unichar and iterate
