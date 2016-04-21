@@ -62,6 +62,7 @@ string toUTF8(const unsigned int& input) {
 
 string LocaleToUtf8(const string & locale){
 
+	//TODO test windows
 	return locale;
 	
 //	int size = MultiByteToWideChar(CP_THREAD_ACP, // code page
