@@ -45,6 +45,72 @@ std::string searchAndReplace(std::string &s,
     return(s.replace(s.find(toReplace), toReplace.length(), replaceWith));
 }
 
+
+//------------------------------------------------------------------
+string toUTF8(const unsigned int& input) {
+
+	string txt;
+	try {
+		utf8::append(input, back_inserter(txt));
+	}
+	catch (const utf8::exception& utfcpp_ex) {
+		string err = utfcpp_ex.what();
+		ofLog(OF_LOG_ERROR, "ofUTF8::append : " + err);
+	}
+	return txt;
+}
+
+string LocaleToUtf8(const string & locale){
+
+	return locale;
+	
+//	int size = MultiByteToWideChar(CP_THREAD_ACP, // code page
+//								   MB_ERR_INVALID_CHARS, // character-type options
+//								   locale.c_str(), // address of string to map
+//								   -1, // NULL terminated
+//								   NULL, // address of wide-character buffer
+//								   0) + 1;               // size of buffer
+//
+//
+//	WCHAR * pWideChar = new WCHAR[size];
+//
+//	MultiByteToWideChar(CP_THREAD_ACP, // code page
+//						MB_ERR_INVALID_CHARS, // character-type options
+//						locale.c_str(), // address of string to map
+//						-1, // NULL terminated
+//						pWideChar, // address of wide-character buffer
+//						size);                // size of buffer
+//
+//
+//	size = WideCharToMultiByte(CP_UTF8, // code page
+//							   0, // performance and mapping flags
+//							   pWideChar, // address of wide-character string
+//							   -1, // NULL terminated
+//							   NULL, // address of buffer for new string
+//							   0, // size of buffer
+//							   NULL, // address of default for unmappable characters
+//							   NULL) + 1; // address of flag set when default char used
+//
+//
+//	char * pUtf8 = new char[size];
+//
+//	WideCharToMultiByte(CP_UTF8, // code page
+//						0, // address of wide-character string
+//						pWideChar, // address of wide-character string
+//						-1, // NULL terminated
+//						pUtf8, // address of buffer for new string
+//						size, // size of buffer
+//						NULL, // address of default for unmappable characters
+//						NULL);     // address of flag set when default char used
+//
+//
+//	string Utf8 = pUtf8;
+//
+//	delete[] pWideChar;
+//	delete[] pUtf8;
+//	return Utf8;
+}
+
 /* *********************************************************************** */
 
 ofxFontStash::ofxFontStash(){
@@ -97,8 +163,13 @@ void ofxFontStash::addFont(const std::string &fontFile)
 }
 
 
-void ofxFontStash::draw( const string& text, float size, float x, float y){
-	
+void ofxFontStash::draw( const string& _text, float size, float x, float y){
+
+	string text = _text;
+	if (!utf8::is_valid(text.begin(), text.end())){
+		text = LocaleToUtf8(text);
+	}
+
 	if (stash != NULL){
 		float dx = 0;
 		
@@ -114,8 +185,13 @@ void ofxFontStash::draw( const string& text, float size, float x, float y){
 }
 
 
-void ofxFontStash::drawMultiLine( const string& text, float size, float x, float y){
-	
+void ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y){
+
+	string text = _text;
+	if (!utf8::is_valid(text.begin(), text.end())){
+		text = LocaleToUtf8(text);
+	}
+
 	if (stash != NULL){
 
 		glPushMatrix();
@@ -147,9 +223,14 @@ void ofxFontStash::drawMultiLine( const string& text, float size, float x, float
 }
 
 
-ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float x, float y,
+ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float x, float y,
 											  float maxW, int &numLines, bool dontDraw, int maxLines,
 											  bool giveBackNewLinedText, bool* wordsWereTruncated){
+
+	string text = _text;
+	if (!utf8::is_valid(text.begin(), text.end())){
+		text = LocaleToUtf8(text);
+	}
 
 	ofRectangle totalArea = ofRectangle(x,y,0,0);
 
@@ -169,26 +250,27 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 		vector<string>splitLines;
 		ofRectangle r;
 
-		//ofUTF8Ptr start = ofUTF8::beginPtr(text);
-		ofUTF8Ptr iter = ofUTF8::beginPtr(text);
-		ofUTF8Ptr lineStart = iter;
-		ofUTF8Ptr lastSpace;
-        ofUTF8Ptr stop = ofUTF8::endPtr(text);
+		const char * iter = text.c_str();
+		const char * lineStart = iter;
+		const char * lastSpace;
+		const char * stop = text.c_str() + text.length();
 
         string thisLine = "";
 		bool foundSpace = false;
 		bool foundNewLine = false;
         while(iter < stop) {
 
-			ofUniChar c = ofUTF8::getNext(iter); // get the next unichar and iterate
-			if ( ofxUnicode::isSpace(c) ){
+			unsigned int c = utf8::unchecked::next(iter); // get the next unichar and iterate
+			if ( isSpace(c) ){
 				foundSpace = true;
 				lastSpace = iter;
 			}
-			if ( ofTextConverter::toUTF8(c) == "\n" ){
+			if ( toUTF8(c) == "\n" ){
 				foundNewLine = true;
 			}
-            thisLine += ofTextConverter::toUTF8(c);
+
+			thisLine += toUTF8(c);
+
 			r = getBBox(thisLine.c_str(), size, 0,0);
 			if ( r.width > maxW || foundNewLine ) { //we went too far, lets jump back to our closest space
 				if(foundNewLine){
@@ -205,7 +287,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 						splitLines.push_back(finalLine);
 						
 						// Edge case where if max width is met and first character is space
-						if(!ofxUnicode::isSpace(ofUTF8::get(lineStart))){
+						if(!(utf8::unchecked::next(lineStart) == 0x20)){
 							iter = lastSpace;
 						}
 					}else{
@@ -276,9 +358,14 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & text, float size, float 
 }
 
 
-ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &text, float size, float columnWidth, bool topLeftAlign, bool dryrun){
+ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, float columnWidth, bool topLeftAlign, bool dryrun){
 
 	float maxX=0;
+
+	string text = _text;
+	if (!utf8::is_valid(text.begin(), text.end())){
+		text = LocaleToUtf8(text);
+	}
 
 	if (stash == NULL || fontIds.empty()) {
 		ofLogError("ofxFontStash") << "error: stash not initialized or no font";
@@ -490,17 +577,18 @@ void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, 
 }
 
 
-string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
+//string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr end){
+string ofxFontStash::walkAndFill(const char * begin, const char *& iter, const char * end){
 
 	string finalLine = "";
-	ofUTF8Ptr i = begin;
+	const char * i = begin;
 	while (i < iter) { // re-fill the finalLine from the begining to the last Space
-        // Ignore any spaces at the beginning of the line
-        ofUniChar c = ofUTF8::getNext(i);
-        if (finalLine.empty() && ofxUnicode::isSpace(c))
-            continue;
+		// Ignore any spaces at the beginning of the line
+		unsigned int c = utf8::unchecked::next(i);
+		if (finalLine.empty() && c == 0x20)		// 0x20 UTF-8 space
+			continue;
 
-		finalLine += ofTextConverter::toUTF8(c); // get the next unichar and iterate
+		finalLine += toUTF8(c); // get the next unichar and iterate
 		if(i == end){
 			break;
 		}
@@ -508,6 +596,27 @@ string ofxFontStash::walkAndFill(ofUTF8Ptr begin, ofUTF8Ptr & iter, ofUTF8Ptr en
 	return finalLine;
 }
 
+bool ofxFontStash::isSpace(unsigned int c){
+	//http://www.fileformat.info/info/unicode/category/Zs/list.htm
+	return 	c == 0x20 || c == 0xA0 || c == 0x1680 || c == 0x2000 || c == 0x2001
+	|| c == 0x2002
+	|| c == 0x2003 || c == 0x2004 || c == 0x2005 || c == 0x2006 || c == 0x2007 || c == 0x2028
+	|| c == 0x2029
+	|| c == 0x2008 || c == 0x2009 || c == 0x200A || c == 0x202F || c == 0x205F || c == 0x3000
+//	//https://en.wikipedia.org/wiki/Whitespace_character
+//	|| c == 0x0009 //tab
+//	|| c == 0x000A //line feed
+//	|| c == 0x000B //line tab
+//	|| c == 0x000C //form feed
+//	|| c == 0x000F //carriage return
+//	|| c == 0x0085 //next line
+	;
+}
+
+bool ofxFontStash::isPunctuation(unsigned int c){
+	//http://www.fileformat.info/info/unicode/category/Zs/list.htm
+	return 	c == 0xFF0C || c == 0xFF0C;
+}
 
 void ofxFontStash::setKerning(bool enabled){
 	if (stash){
@@ -526,6 +635,7 @@ bool ofxFontStash::getKerning(){
 	}
 	return false;
 }
+
 
 ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy ){
 
@@ -560,9 +670,9 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 		if(line > 1){ //if multiline
 			totalArea.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
-				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
+#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 				totalArea = totalArea.getUnion(rects[i]);	//TODO
-				#endif
+#endif
 			}
 		}else{
 			totalArea.y -= totalArea.height;
