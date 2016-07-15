@@ -44,7 +44,6 @@ ipch/
 local.properties
 .externalToolBuilders
 
-
 #codelite
 *.session
 *.tags
@@ -56,6 +55,7 @@ local.properties
 *~
 # KDE
 .directory
+.AppleDouble
 
 #OSX
 .DS_Store
