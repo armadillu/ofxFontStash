@@ -27,6 +27,10 @@ ofxFontStash is quite [fast](http://www.flickr.com/photos/armadillu/7268071284/s
 
 Font Stash was originally created and [published](http://digestingduck.blogspot.com/2009/08/font-stash.html) by [Mikko Mononen](http://digestingduck.blogspot.com).
 
+## Notes
+
+To get this to work on a Raspberry Pi, you need to rename "libs/fontstash/src/fontstash.c" and "libs/fontstash/src/stb_truetype.c" from *.c to *.cpp.
+
 ## License
 
 ofxFontStash.cpp and ofxFontStash.h have been created by Oriol Ferrer Mesià and released under [MIT license](http://www.opensource.org/licenses/mit-license.php).
