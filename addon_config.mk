@@ -29,11 +29,11 @@ common:
 	# include search paths, this will be usually parsed from the file system
 	# but if the addon or addon libraries need special search paths they can be
 	# specified here separated by spaces or one per line using +=
-	# ADDON_INCLUDES = libs/fontstash/src
+	  ADDON_INCLUDES += libs/fontstash/src
 	
 	# any special flag that should be passed to the compiler when using this
-	# addon
-	# ADDON_CFLAGS = -c
+	# addon 
+	#  ADDON_CFLAGS
 	
 	# any special flag that should be passed to the linker when using this
 	# addon, also used for system libraries with -lname
@@ -50,7 +50,7 @@ common:
 	# in the src folders in libs and the root of the addon. if your addon needs
 	# to include files in different places or a different set of files per platform
 	# they can be specified here
-	# ADDON_SOURCES = libs/fontstash/src
+	# ADDON_SOURCES =
 	
 	# some addons need resources to be copied to the bin/data folder of the project
 	# specify here any files that need to be copied, you can use wildcards like * and ?
@@ -59,4 +59,16 @@ common:
 	# when parsing the file system looking for libraries exclude this for all or
 	# a specific platform
 	# ADDON_LIBS_EXCLUDE =
+	
+	
+	linuxarmv6l: 
+	
+	# I tried everything that came to mind, but I cant get the .c files in this addon to compile on the rPi.
+	# As a workardound, rename /libs/fontstash/src/fontstash.c and /libs/fontstash/src/stb_truetype.c to .cpp.
+	
+	# TODO the "$(addon)" is hacky as I peek through the config.addons.mk to find it and might change at any time
+	# the intention here is to get the makefile to compile the .c file (seems to only handle .cpp)
+	#  ADDON_CFLAGS = -x c $(addon)/libs/fontstash/src/fontstash.c -x c $(addon)/libs/fontstash/src/stb_truetype.c
+
+	# ADDON_SOURCES = $(addon)/libs/fontstash/src/fontstash.c $(addon)/libs/fontstash/src/stb_truetype.c
 	
