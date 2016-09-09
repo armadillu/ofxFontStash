@@ -103,13 +103,14 @@ void ofApp::draw(){
 	column = unicodeFont.drawMultiLineColumn(	s,			/*string*/
 												16,			/*size*/
 												x, y,		/*where*/
-												MAX( 10 ,mouseX - x), /*column width*/
+												MAX( 10, mouseX - x), /*column width*/
 												numLines,	/*get back the number of lines*/
 												false,		/* if true, we wont draw (just get bbox back) */
 												9,			/* max number of lines to draw, crop after that */
 												true,		/*get the final text formatting (by adding \n's) in the supplied string;
 															 BE ARWARE that using TRUE in here will modify your supplied string! */
-												&wordsWereCropped /* this bool will b set to true if the box was to small to fit all text*/
+												&wordsWereCropped, /* this bool will b set to true if the box was to small to fit all text*/
+											 	true		/*centered*/
 											 );
 	TIME_SAMPLE_STOP("drawMultiLineColumn");
 

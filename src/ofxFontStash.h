@@ -86,7 +86,8 @@ class ofxFontStash{
 										bool dontDraw = false,
 										int maxLines = 0,
 										bool giveBackNewLinedText = false,
-										bool * wordsWereTruncated = NULL
+										bool * wordsWereTruncated = NULL,
+										bool centered = false
 										);
 
 /**
