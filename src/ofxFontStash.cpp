@@ -134,9 +134,13 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 		lineHeight = lineHeightPercent;
 		texDimension = ofNextPow2(_texDimension);
 		stash = ofx_sth_create(texDimension,texDimension, createMipMaps, intraCharPadding, dpiScale);
-		stash->doKerning = 0; //kerning disabled by default
-		stash->charSpacing = 0.0; //spacing neutral by default
-		addFont(firstFontFile);
+		if (stash == NULL) {
+			ofLogError("ofxFontStash") << "could not create stash for font '" << firstFontFile << "'";
+		}else {
+			stash->doKerning = 0; //kerning disabled by default
+			stash->charSpacing = 0.0; //spacing neutral by default
+			addFont(firstFontFile);
+		}
 	}else{
 		ofLogError("ofxFontStash") << "don't call setup() more than once!";
 	}
