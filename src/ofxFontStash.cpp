@@ -61,55 +61,7 @@ string toUTF8(const unsigned int& input) {
 }
 
 string LocaleToUtf8(const string & locale){
-
-	//TODO test windows
 	return locale;
-	
-//	int size = MultiByteToWideChar(CP_THREAD_ACP, // code page
-//								   MB_ERR_INVALID_CHARS, // character-type options
-//								   locale.c_str(), // address of string to map
-//								   -1, // NULL terminated
-//								   NULL, // address of wide-character buffer
-//								   0) + 1;               // size of buffer
-//
-//
-//	WCHAR * pWideChar = new WCHAR[size];
-//
-//	MultiByteToWideChar(CP_THREAD_ACP, // code page
-//						MB_ERR_INVALID_CHARS, // character-type options
-//						locale.c_str(), // address of string to map
-//						-1, // NULL terminated
-//						pWideChar, // address of wide-character buffer
-//						size);                // size of buffer
-//
-//
-//	size = WideCharToMultiByte(CP_UTF8, // code page
-//							   0, // performance and mapping flags
-//							   pWideChar, // address of wide-character string
-//							   -1, // NULL terminated
-//							   NULL, // address of buffer for new string
-//							   0, // size of buffer
-//							   NULL, // address of default for unmappable characters
-//							   NULL) + 1; // address of flag set when default char used
-//
-//
-//	char * pUtf8 = new char[size];
-//
-//	WideCharToMultiByte(CP_UTF8, // code page
-//						0, // address of wide-character string
-//						pWideChar, // address of wide-character string
-//						-1, // NULL terminated
-//						pUtf8, // address of buffer for new string
-//						size, // size of buffer
-//						NULL, // address of default for unmappable characters
-//						NULL);     // address of flag set when default char used
-//
-//
-//	string Utf8 = pUtf8;
-//
-//	delete[] pWideChar;
-//	delete[] pUtf8;
-//	return Utf8;
 }
 
 /* *********************************************************************** */
@@ -135,14 +87,14 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 		texDimension = ofNextPow2(_texDimension);
 		stash = ofx_sth_create(texDimension,texDimension, createMipMaps, intraCharPadding, dpiScale);
 		if (stash == NULL) {
-			ofLogError("ofxFontStash") << "could not create stash for font '" << firstFontFile << "'";
+			ofLogError("ofxFontStash") << "Could not create stash for font '" << firstFontFile << "'";
 		}else {
 			stash->doKerning = 0; //kerning disabled by default
 			stash->charSpacing = 0.0; //spacing neutral by default
 			addFont(firstFontFile);
 		}
 	}else{
-		ofLogError("ofxFontStash") << "don't call setup() more than once!";
+		ofLogError("ofxFontStash") << "Don't call setup() more than once!";
 	}
 
 	return false;
@@ -164,7 +116,7 @@ void ofxFontStash::addFont(const std::string &fontFile)
 
 	fontIds.push_back(fontId);
 
-	ofLogNotice("ofxFontStash") << "loaded font '" << fontFile << "' in texture ("<<texDimension<<" x "<<texDimension<<")";
+	ofLogNotice("ofxFontStash") << "Loaded font '" << fontFile << "' in texture ("<<texDimension<<" x "<<texDimension<<")";
 }
 
 
@@ -185,7 +137,7 @@ void ofxFontStash::draw( const string& _text, float size, float x, float y){
 		ofx_sth_end_draw(stash); // this actually draws
 		glPopMatrix();
 	}else{
-		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
+		ofLogError("ofxFontStash") << "Can't draw() without having been setup first!";
 	}		
 }
 
@@ -567,10 +519,10 @@ void ofxFontStash::drawBatch( const string& text, float size, float x, float y){
 			ofx_sth_end_draw(stash); // this actually draws
 			ofPopMatrix();
 		}else{
-			ofLogError("ofxFontStash") <<"can't drawBatch() without calling beginBatch() first!";
+			ofLogError("ofxFontStash") <<"Can't drawBatch() without calling beginBatch() first!";
 		}
 	}else{
-		ofLogError("ofxFontStash") << "can't drawBatch() without having been setup first!";
+		ofLogError("ofxFontStash") << "Can't drawBatch() without having been setup first!";
 	}
 }
 
@@ -589,10 +541,10 @@ void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, 
 				line ++;
 			}
 		}else{
-			ofLogError("ofxFontStash") <<"can't drawBatch() without calling beginBatch() first!";
+			ofLogError("ofxFontStash") << "Can't drawBatch() without calling beginBatch() first!";
 		}
 	}else{
-		ofLogError("ofxFontStash") << "can't drawBatch() without having been setup first!";
+		ofLogError("ofxFontStash") << "Can't drawBatch() without having been setup first!";
 	}
 }
 
@@ -642,7 +594,7 @@ void ofxFontStash::setKerning(bool enabled){
 	if (stash){
 		stash->doKerning = enabled ? 1 : 0;
 	}else{
-		ofLogError("ofxFontStash") <<"can't setKerning() without having been setup() first!";
+		ofLogError("ofxFontStash") << "Can't setKerning() without having been setup() first!";
 	}
 }
 
@@ -651,7 +603,7 @@ bool ofxFontStash::getKerning(){
 	if (stash){
 		return stash->doKerning != 0;
 	}else{
-		ofLogError("ofxFontStash") << "can't getKerning() without having been setup() first!";
+		ofLogError("ofxFontStash") << "Can't getKerning() without having been setup() first!";
 	}
 	return false;
 }
@@ -699,7 +651,7 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 		}
 
 	}else{
-		ofLogError("ofxFontStash") << "can't getBoundingBoxSize() without having been setup first!";
+		ofLogError("ofxFontStash") << "Can't getBoundingBoxSize() without having been setup first!";
 	}
 
 	if(extraPadding > 0){
