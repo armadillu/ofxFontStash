@@ -300,7 +300,7 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 				ofPushMatrix();
 				float xOff = 0;
 				if (centered){
-					xOff += (totalArea.width - lineWidths[i]) / 2.0f;
+					xOff += (maxW - lineWidths[i]) / 2.0f;
 				}
 				ofTranslate(xOff, yy);
 				drawBatch(splitLines[i], size, 0, 0 );
