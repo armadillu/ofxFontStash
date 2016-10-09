@@ -69,10 +69,10 @@ class ofxFontStash{
 		void addFont(const std::string& fontFile);
 
 		//will draw text in one line, ignoring "\n"'s
-		void draw( const string& text, float size, float x, float y);
+		float draw( const string& text, float size, float x, float y);
 
 		//text with "\n" will produce line breaks
-		void drawMultiLine( const string& text, float fontSize, float x, float y );
+		ofRectangle drawMultiLine( const string& text, float fontSize, float x, float y);
 
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
@@ -122,9 +122,8 @@ class ofxFontStash{
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
 		ofRectangle getBBox( const string& text, float size, float x, float y );
-		ofRectangle getBBox( const string& text, float size, float x, float y, float columnWidth );
-
-
+	
+	
 		//interleave drawBatch* calls between begin() and end()
 		void beginBatch();
 		void drawBatch( const string& text, float size, float x, float y);
@@ -183,9 +182,9 @@ class ofxFontStash{
         int					fontSize;
 		float				dpiScale;
 
-
-	bool isSpace(unsigned int c);
-	bool isPunctuation(unsigned int c);
+	
+		bool isSpace(unsigned int c);
+		bool isPunctuation(unsigned int c);
 };
 
 

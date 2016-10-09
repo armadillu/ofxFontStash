@@ -120,15 +120,15 @@ void ofxFontStash::addFont(const std::string &fontFile)
 }
 
 
-void ofxFontStash::draw( const string& _text, float size, float x, float y){
+float ofxFontStash::draw( const string& _text, float size, float x, float y){
 
 	string text = _text;
+	float dx = 0;
 	if (!utf8::is_valid(text.begin(), text.end())){
 		text = LocaleToUtf8(text);
 	}
 
 	if (stash != NULL){
-		float dx = 0;
 		
 		glPushMatrix();
 		glTranslatef(x, y, 0.0);
@@ -138,17 +138,20 @@ void ofxFontStash::draw( const string& _text, float size, float x, float y){
 		glPopMatrix();
 	}else{
 		ofLogError("ofxFontStash") << "Can't draw() without having been setup first!";
-	}		
+	}
+	return dx;
 }
 
 
-void ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y){
+ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y){
 
 	string text = _text;
 	if (!utf8::is_valid(text.begin(), text.end())){
 		text = LocaleToUtf8(text);
 	}
 
+	ofRectangle area;
+	
 	if (stash != NULL){
 
 		glPushMatrix();
@@ -159,13 +162,32 @@ void ofxFontStash::drawMultiLine( const string& _text, float size, float x, floa
 			string s;
 			int line = 0;
 			while ( getline(ss, s, '\n') ) {
-				//cout << s << endl;
 				float dx = 0;
+				
+				float yy = size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale;
+				ofRectangle dim;
+				dim = getBBox(s, size, x, y + yy / dpiScale );
+				
+				//debug
+//				ofPushMatrix();
+//					ofColor c; c.setHsb((44 * line)%255, 255, 255);
+//					ofSetColor(c,16);
+//					glTranslatef(-x, -y, 0.0f);
+//					ofDrawRectangle(dim);
+//					ofSetColor(255);
+//				ofPopMatrix();
+				
+				if(line == 0){
+					area = dim;
+				}else{
+					area = area.getUnion(dim);
+				}
+				
 				ofx_sth_draw_text(stash,
 							  fontIds[0],
 							  size,
 							  0.0f,
-							  size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale,
+							  yy,
 							  s.c_str(),
 							  &dx
 							  );
@@ -176,7 +198,8 @@ void ofxFontStash::drawMultiLine( const string& _text, float size, float x, floa
 
 	}else{
 		ofLogError("ofxFontStash") << "can't draw() without having been setup first!";
-	}		
+	}
+	return area;
 }
 
 
@@ -294,19 +317,26 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 			#endif
 		}
 
+		float smallestOffset = FLT_MAX; //bc of centering, we might shift lines to the right
 		for(int i = 0; i < linesToDraw; i++){
 			float yy = lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * size * i;
 			if(!dontDraw){
 				ofPushMatrix();
 				float xOff = 0;
 				if (centered){
-					xOff += (maxW - lineWidths[i]) / 2.0f;
+					float offset = (maxW - lineWidths[i]) / 2.0f;
+					if(offset < smallestOffset) smallestOffset = offset;
+					xOff += offset;
 				}
 				ofTranslate(xOff, yy);
 				drawBatch(splitLines[i], size, 0, 0 );
 				ofPopMatrix();
 			}
 		}
+		if(centered){
+			totalArea.x += smallestOffset;
+		}
+		
 		if(!dontDraw){
 			endBatch();
 			glPopMatrix();
@@ -620,31 +650,37 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 		float totalH = 0;
 		vector<ofRectangle> rects;
 		while ( getline(ss, s, '\n') ) {
+			
 			float dx = 0;
 			float w, h, x, y;
-
 			ofx_sth_dim_text( stash, fontIds[0], size / dpiScale, s.c_str(), &x, &y, &w, &h);
+			
 			totalArea.x = x + xx;
 			totalArea.y = yy + y ;
 			w = fabs (w - x);
-			h = fabs(y - h);
+			h = fabs (y - h);
 			if(w > totalArea.width) totalArea.width = w;
 			if(h > totalArea.height) totalArea.height = h;
 			ofRectangle r2 = totalArea;
 			r2.y -= r2.height;
-			r2.y += ((size * lineHeight) / dpiScale) * OFX_FONT_STASH_LINE_HEIGHT_MULT * line;
+			r2.y += ((size * lineHeight)) * OFX_FONT_STASH_LINE_HEIGHT_MULT * line;
 			rects.push_back(r2);
-			//ofSetColor(255,32); //debug
-			//ofRect(r2);
+
+			//debug
+//			ofColor c; c.setHsb((44 * line)%255, 255, 255);
+//			ofSetColor(c,22); //debug
+//			ofRect(r2);
+//			ofSetColor(255);
+
 			line ++;
 		}
 
 		if(line > 1){ //if multiline
 			totalArea.y -= rects[0].height;
 			for(int i = 0; i < rects.size(); i++){
-#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
+				#if OF_VERSION_MAJOR == 0 && OF_VERSION_MINOR >= 8
 				totalArea = totalArea.getUnion(rects[i]);	//TODO
-#endif
+				#endif
 			}
 		}else{
 			totalArea.y -= totalArea.height;

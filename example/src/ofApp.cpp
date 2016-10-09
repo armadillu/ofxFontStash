@@ -42,7 +42,7 @@ void ofApp::draw(){
 
 	// simple demo //////////////////////////////////////////////////////////
 	
-	drawPoint(x, y);		//draw insertion point	
+	drawPoint(x, y);		//draw insertion point
 
 	ofSetColor(255);
 	TIME_SAMPLE_START("simple draw");
@@ -53,7 +53,27 @@ void ofApp::draw(){
 				  y			//y coord where to draw
 			  );
 	TIME_SAMPLE_STOP("simple draw");
-
+	
+	if(true){
+		auto words = {"aaa", "bbb", "sdguisd", "adfd gfsgsg"};
+		int xxx = 500;
+		float fontSize = 24;
+		float y = 500;
+		ofDrawLine(xxx, y, ofGetWidth(), y);
+		for(auto w : words){
+			ofRectangle r = font.getBBox(w, fontSize, xxx, y);
+			ofSetColor(255,0,0, 64);
+			ofDrawRectangle(r);
+			ofSetColor(255);
+			float xInc = font.draw(w, fontSize, xxx, y);
+			ofSetColor(0,255,0);
+			ofDrawCircle(xxx,y,1);
+			ofSetColor(255,33);
+			xxx += xInc;
+		}
+	}
+	
+	
 	// bounding box demo ///////////////////////////////////////////////////
 
 	ofSetColor(0, 0, 255, 64);
@@ -70,19 +90,23 @@ void ofApp::draw(){
 	ofSetColor(255);
 	string s = (string)"ofxFontStash can draw multiline text" + "\n" +
 	"It also supports unicode strings: " + "\n" +
-	"槊監しゅ祟䤂לרפובליקה. אם מיזם銆銌 憉 圩芰敔 तकनिकल कार्यलय";
-
+	"槊監しゅ祟䤂לרפובליקה. אם מיזם銆銌 憉 圩芰敔 तकनिकल कार्यलय" + "\n" +
+	"bananas from russia!";
+	
 	TIME_SAMPLE_START("drawMultiLine");
-	unicodeFont.drawMultiLine( s, fontSize, x, y);
+	bbox = unicodeFont.drawMultiLine( s, fontSize, x, y);
 	TIME_SAMPLE_STOP("drawMultiLine");
+	ofSetColor(0, 255, 255, 64);
+	ofRect( bbox );
 
 	// multiline bbox /////////////////////////////////////////////////////
 
-	ofSetColor(0, 255, 0, 32);
 	TIME_SAMPLE_START("getBoundingBoxSize");
 	bboxMultiline = unicodeFont.getBBox( s, fontSize, x, y);
 	TIME_SAMPLE_STOP("getBoundingBoxSize");
 	ofNoFill();
+	ofColor c; c.setHsb((44 * ofGetFrameNum())%255, 255, 255);
+	ofSetColor(c, 128);
 	ofRect( bboxMultiline );
 	ofFill();
 
