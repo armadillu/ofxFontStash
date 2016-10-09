@@ -72,7 +72,8 @@ class ofxFontStash{
 		float draw( const string& text, float size, float x, float y);
 
 		//text with "\n" will produce line breaks
-		ofRectangle drawMultiLine( const string& text, float fontSize, float x, float y);
+		//width only makes sense for align = OF_ALIGN_HORZ_CENTER - as it will center the text block to the rect defined by [x + width] 
+		ofRectangle drawMultiLine( const string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0);
 
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
@@ -121,7 +122,7 @@ class ofxFontStash{
 		float getFontHeight(float fontSize);
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
-		ofRectangle getBBox( const string& text, float size, float x, float y );
+		ofRectangle getBBox( const string& text, float size, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0 );
 	
 	
 		//interleave drawBatch* calls between begin() and end()

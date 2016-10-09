@@ -93,8 +93,11 @@ void ofApp::draw(){
 	"槊監しゅ祟䤂לרפובליקה. אם מיזם銆銌 憉 圩芰敔 तकनिकल कार्यलय" + "\n" +
 	"bananas from russia!";
 	
+	ofAlignHorz align = OF_ALIGN_HORZ_CENTER;
+	float width = ofGetMouseX() - x; //when centering, we need a box w to center around
+	
 	TIME_SAMPLE_START("drawMultiLine");
-	bbox = unicodeFont.drawMultiLine( s, fontSize, x, y);
+	bbox = unicodeFont.drawMultiLine( s, fontSize, x, y, align, width);
 	TIME_SAMPLE_STOP("drawMultiLine");
 	ofSetColor(0, 255, 255, 64);
 	ofRect( bbox );
@@ -102,7 +105,7 @@ void ofApp::draw(){
 	// multiline bbox /////////////////////////////////////////////////////
 
 	TIME_SAMPLE_START("getBoundingBoxSize");
-	bboxMultiline = unicodeFont.getBBox( s, fontSize, x, y);
+	bboxMultiline = unicodeFont.getBBox( s, fontSize, x, y, align, width);
 	TIME_SAMPLE_STOP("getBoundingBoxSize");
 	ofNoFill();
 	ofColor c; c.setHsb((44 * ofGetFrameNum())%255, 255, 255);

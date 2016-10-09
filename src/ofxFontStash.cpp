@@ -143,55 +143,78 @@ float ofxFontStash::draw( const string& _text, float size, float x, float y){
 }
 
 
-ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y){
-
-	string text = _text;
-	if (!utf8::is_valid(text.begin(), text.end())){
-		text = LocaleToUtf8(text);
-	}
+ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y, ofAlignHorz align, float width){
 
 	ofRectangle area;
 	
 	if (stash != NULL){
 
+		string text = _text;
+		if (!utf8::is_valid(text.begin(), text.end())){
+			text = LocaleToUtf8(text);
+		}
+
+		stringstream ss(text);
+		string s;
+		int line = 0;
+		vector<string> lines;
+		vector<float> widths;
+		vector<float> ys;
+		float maxW = width;
+		
+		while ( getline(ss, s, '\n') ) {
+			lines.push_back(s);
+			float yy = size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale;
+			ys.push_back(yy);
+			ofRectangle dim = getBBox(s, size, x, y + yy / dpiScale );
+			
+			//debug
+//			ofPushMatrix();
+//				ofColor c; c.setHsb((44 * line)%255, 255, 255);
+//				ofSetColor(c,16);
+//				glTranslatef(-x, -y, 0.0f);
+//				ofDrawRectangle(dim);
+//				ofSetColor(255);
+//			ofPopMatrix();
+
+			if(line == 0){
+				area = dim;
+			}else{
+				area = area.getUnion(dim);
+			}
+			widths.push_back(dim.width);
+			if(width == 0){
+				if(maxW < dim.width) maxW = dim.width;
+			}
+			line++;
+		}
+
 		glPushMatrix();
 			glTranslatef(x, y, 0.0f);
 			ofx_sth_begin_draw(stash);
+			{
 			
-			stringstream ss(text);
-			string s;
-			int line = 0;
-			while ( getline(ss, s, '\n') ) {
-				float dx = 0;
-				
 				float yy = size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line * dpiScale;
-				ofRectangle dim;
-				dim = getBBox(s, size, x, y + yy / dpiScale );
-				
-				//debug
-//				ofPushMatrix();
-//					ofColor c; c.setHsb((44 * line)%255, 255, 255);
-//					ofSetColor(c,16);
-//					glTranslatef(-x, -y, 0.0f);
-//					ofDrawRectangle(dim);
-//					ofSetColor(255);
-//				ofPopMatrix();
-				
-				if(line == 0){
-					area = dim;
-				}else{
-					area = area.getUnion(dim);
+				float minDiffX = FLT_MAX;
+				for(int i = 0; i < lines.size(); i++){
+					float dx = 0;
+					float x = 0;
+					switch (align) {
+						case OF_ALIGN_HORZ_LEFT: break;
+						case OF_ALIGN_HORZ_RIGHT: x = maxW - widths[i]; break;
+						case OF_ALIGN_HORZ_CENTER: x = (maxW - widths[i]) * 0.5; break;
+					}
+					if(minDiffX > x) minDiffX = x;
+					ofx_sth_draw_text(stash,
+								  	fontIds[0],
+								  	size,
+									x * dpiScale,
+								  	ys[i],
+								  	lines[i].c_str(),
+								  	&dx
+								  	);
 				}
-				
-				ofx_sth_draw_text(stash,
-							  fontIds[0],
-							  size,
-							  0.0f,
-							  yy,
-							  s.c_str(),
-							  &dx
-							  );
-				line ++;
+				area.x += minDiffX;
 			}
 			ofx_sth_end_draw(stash);
 		glPopMatrix();
@@ -639,7 +662,7 @@ bool ofxFontStash::getKerning(){
 }
 
 
-ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy ){
+ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy, ofAlignHorz align, float width){
 
 	ofRectangle totalArea;
 
@@ -695,6 +718,14 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 		totalArea.height -= extraPadding;
 	}
 
+	if(align != OF_ALIGN_HORZ_LEFT){
+		if(align == OF_ALIGN_HORZ_RIGHT){
+			totalArea.x += width - totalArea.width;
+		}else{
+			totalArea.x += (width - totalArea.width) * 0.5;
+		}
+	}
+	
 	return totalArea;
 }
 
