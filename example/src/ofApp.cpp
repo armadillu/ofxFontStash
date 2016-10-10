@@ -8,16 +8,18 @@ void ofApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(22, 22, 22, 255);
 
-	font.setup("Vera.ttf", 1.0, 1024, false, 8, 1.0);
+	font.setup("Vera.ttf", 1.0, 1024, false, 8, 1.5);
 	font.addFont("VeraMono-Bold.ttf");
 	unicodeFont.setup("Arial Unicode.ttf", //font file, ttf only
 					  1.0,					//lineheight percent
 					  1024,					//texture atlas dimension
 					  true,					//create mipmaps of the font, useful to scale down the font at smaller sizes
 					  8,					//texture atlas element padding, shouldbe >0 if using mipmaps otherwise
-					  2.0f					//dpi scaleup, render textures @2x the reso
+					  1.5f					//dpi scaleup, render textures @2x the reso
 					  );					//lower res mipmaps wil bleed into each other
 
+	unicodeFont.setCharacterSpacing(0);
+	font.setCharacterSpacing(0);
 }
 
 void ofApp::update(){

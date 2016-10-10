@@ -714,6 +714,7 @@ void ofx_sth_draw_text(struct ofx_sth_stash* stash,
 	float spacing = stash->charSpacing;
 	int doKerning = stash->doKerning;
 	int p = stash->padding;
+	float dpiScale = stash->dpiScale;
 	float tw = stash->padding / (float)stash->tw;
 
 	for (; *s; ++s)
@@ -733,7 +734,7 @@ void ofx_sth_draw_text(struct ofx_sth_stash* stash,
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
 			x += diff * scale;
 		}
-		x += scale + spacing;
+		x += dpiScale * spacing;
 
 		v = &texture->verts[texture->nverts*4];
 
@@ -749,7 +750,7 @@ void ofx_sth_draw_text(struct ofx_sth_stash* stash,
 		c++;
 	}
 	
-	if (dx) *dx = x;
+	if (dx) *dx = x / dpiScale;
 }
 
 void ofx_sth_dim_text(struct ofx_sth_stash* stash,
@@ -778,7 +779,8 @@ void ofx_sth_dim_text(struct ofx_sth_stash* stash,
 	int c = 0;
 	float spacing = stash->charSpacing;
 	int doKerning = stash->doKerning;
-
+	float dpiScale = stash->dpiScale;
+	
 	for (; *s; ++s){
 		if (decutf8(&state, &codepoint, *(unsigned char*)s)) continue;
 		glyph = get_glyph(stash, fnt, codepoint, isize);
@@ -789,9 +791,9 @@ void ofx_sth_dim_text(struct ofx_sth_stash* stash,
 		if (c < len && doKerning > 0){
 			diff = ofx_stbtt_GetCodepointKernAdvance(&fnt->font, *(s), *(s+1));
 			//printf("diff '%c' '%c' = %d\n", *(s-1), *s, diff);
-			x += diff * scale + spacing;
+			x += diff * scale;
 		}
-		x += scale + spacing;
+		x += spacing;
 
 		if (q.x0 < *minx) *minx = q.x0;
 		if (q.x1 > *maxx) *maxx = q.x1;
