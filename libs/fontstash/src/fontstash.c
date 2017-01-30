@@ -801,7 +801,7 @@ void ofx_sth_dim_text(struct ofx_sth_stash* stash,
 		if (q.y0 < *maxy) *maxy = q.y0;		//idem
 		c++;
 	}
-	if (floorf(x) > *maxx) *maxx = floorf(x);
+	if (x > *maxx) *maxx = x;
 }
 
 void ofx_sth_vmetrics(struct ofx_sth_stash* stash,
