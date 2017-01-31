@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Executing ci/linux/install.sh"
+echo "Executing ci/install.sh"
 
 
 export OF_ROOT=~/openFrameworks

@@ -88,7 +88,7 @@ PROJECT_EXTERNAL_SOURCE_PATHS = ../../ofxTimeMeasurements/src
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-PROJECT_DEFINES = MEASURE_PERFORMANCE=true
+PROJECT_DEFINES = MEASURE_PERFORMANCE
 
 ################################################################################
 # PROJECT CFLAGS
