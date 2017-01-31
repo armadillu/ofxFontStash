@@ -1,5 +1,7 @@
 # ofxFontStash: Dynamic font glyph cache for OpenGL
 
+[![Build Status](https://travis-ci.org/armadillu/ofxFontStash.svg?branch=master)](https://travis-ci.org/armadillu/ofxFontStash)
+
 Quick and simple Addon wrapping [Font-Stash](https://github.com/akrinke/Font-Stash). 
 
 "Font Stash enables easy string rendering in OpenGL applications. It supports truetype fonts and UTF-8 encoded localized strings. All glyphs are cached in OpenGL texture atlases. Font rasterization is done using Sean Barrett’s stb_truetype.h."
