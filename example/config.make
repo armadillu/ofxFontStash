@@ -37,7 +37,7 @@
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_EXTERNAL_SOURCE_PATHS = 
+PROJECT_EXTERNAL_SOURCE_PATHS = ../../ofxTimeMeasurements/src
 
 ################################################################################
 # PROJECT EXCLUSIONS
@@ -88,7 +88,7 @@
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_DEFINES = 
+PROJECT_DEFINES = MEASURE_PERFORMANCE=true
 
 ################################################################################
 # PROJECT CFLAGS
