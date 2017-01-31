@@ -18,7 +18,7 @@ meta:
 	ADDON_NAME = ofxFontStash
 	ADDON_DESCRIPTION = Easy (and fast) unicode string rendering addon for OpenFrameworks. FontStash is made by Andreas Krinke and Mikko Mononen
 	ADDON_AUTHOR = armadillu
-	ADDON_TAGS = "Font" "Typography" "Unicode"
+	ADDON_TAGS = "Font" "Typography" "Unicode" "fontstash"
 	ADDON_URL = https://github.com/armadillu/ofxFontStash
 
 common:
