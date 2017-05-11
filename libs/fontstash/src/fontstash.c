@@ -544,14 +544,14 @@ static struct ofx_sth_glyph* get_glyph(struct ofx_sth_stash* stash, struct ofx_s
 		if(stash->hasMipMap > 0){
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8); //TODO check for hw support!
-#if defined(__ANDROID__) || defined(TARGET_OS_IPHONE_SIMULATOR) || (TARGET_IPHONE_SIMULATOR == 1) || (TARGET_OS_IPHONE == 1) || defined(TARGET_IPHONE) || defined(TARGET_RASPBERRY_PI)
+			#if defined(__ANDROID__) || defined(TARGET_OPENGLES) || defined(TARGET_RASPBERRY_PI)
 				// OpenGLES 1.0 does not support the following.
-#else
+			#else
 //			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0); //shoot for sharper test
 //			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 3); // pick mipmap level 7 or lower
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0);
+//			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.0);
 			glGenerateMipmap(GL_TEXTURE_2D);
-#endif
+			#endif
 		}
 		free(bmp);
 	}
@@ -608,9 +608,9 @@ void set_lod_bias(struct ofx_sth_stash* stash, float bias){
 		while (texture){
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, texture->id);
-#ifndef TARGET_OS_IOS
+			#ifndef TARGET_OPENGLES
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
-#endif
+			#endif
 			glBindTexture(GL_TEXTURE_2D, 0);
 			glDisable(GL_TEXTURE_2D);
 			texture = texture->next;
