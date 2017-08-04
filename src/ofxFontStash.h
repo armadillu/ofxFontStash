@@ -130,6 +130,7 @@ class ofxFontStash{
 		void drawBatch( const string& text, float size, float x, float y);
 		void drawMultiLineBatch( const string& text, float size, float x, float y );
 		void endBatch();
+		bool isInBatch(){return batchDrawing;}
 
 		void setLineHeight(float percent);
 
