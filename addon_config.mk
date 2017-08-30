@@ -60,6 +60,7 @@ common:
 	# a specific platform
 	# ADDON_LIBS_EXCLUDE =
 	
+	ADDON_DEFINES = USE_OFX_FONTSTASH
 	
 	linuxarmv6l: 
 	
