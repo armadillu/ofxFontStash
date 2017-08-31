@@ -34,6 +34,8 @@
 #include <iostream>
 #include "ofxFontStash.h"
 
+using namespace std;
+
 std::string searchAndReplace(std::string &s,
 							 std::string toReplace,
 							 std::string replaceWith);

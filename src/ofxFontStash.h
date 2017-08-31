@@ -51,7 +51,7 @@ class ofxFontStash{
 		~ofxFontStash();
 	
 		//call this to set your font file (.ttf, etc)
-		bool setup(string firstFontFile,
+		bool setup(std::string firstFontFile,
 				   float lineHeightPercent = 1.0f,
 				   int textureDimension = 512,	//texture atlas size, must be PowerOfTwo (512, 1024, 2048, etc)
 				   bool createMipMaps = false,	//create mipmaps for the texture atlasas; if you do
@@ -69,16 +69,16 @@ class ofxFontStash{
 		void addFont(const std::string& fontFile);
 
 		//will draw text in one line, ignoring "\n"'s
-		float draw( const string& text, float size, float x, float y);
+		float draw( const std::string& text, float size, float x, float y);
 
 		//text with "\n" will produce line breaks
 		//width only makes sense for align = OF_ALIGN_HORZ_CENTER - as it will center the text block to the rect defined by [x + width] 
-		ofRectangle drawMultiLine( const string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0);
+		ofRectangle drawMultiLine( const std::string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0);
 
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
 		//numLines will return the number of lines this has been split in
-		ofRectangle drawMultiLineColumn(string &text,
+		ofRectangle drawMultiLineColumn(std::string &text,
 										float fontSize,
 										float x,
 										float y,
@@ -116,19 +116,19 @@ class ofxFontStash{
 		example 4: "this is %2.2 more than double %1 the size"
 **/
 
-		ofVec2f drawMultiColumnFormatted(const string &text, float size, float columnWidth, bool topLeftAlign = false, bool dryrun = false);
+		ofVec2f drawMultiColumnFormatted(const std::string &text, float size, float columnWidth, bool topLeftAlign = false, bool dryrun = false);
 
 
 		float getFontHeight(float fontSize);
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
-		ofRectangle getBBox( const string& text, float size, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0 );
+		ofRectangle getBBox( const std::string& text, float size, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0 );
 	
 	
 		//interleave drawBatch* calls between begin() and end()
 		void beginBatch();
-		void drawBatch( const string& text, float size, float x, float y);
-		void drawMultiLineBatch( const string& text, float size, float x, float y );
+		void drawBatch( const std::string& text, float size, float x, float y);
+		void drawMultiLineBatch( const std::string& text, float size, float x, float y );
 		void endBatch();
 		bool isInBatch(){return batchDrawing;}
 
@@ -142,7 +142,7 @@ class ofxFontStash{
 		void setLodBias(float bias); //only makes sense when using mipmaps!
 
         // ofTrueTypeFont parity methods
-        bool loadFont(string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
+        bool loadFont(std::string filename, int fontsize, float lineHeightPercent = 1.0f, int textureDimension = 512);
         bool isLoaded();
     
         void setSize(int fontsize);
@@ -154,12 +154,12 @@ class ofxFontStash{
 		float getCharacterSpacing(){return stash->charSpacing;}
 		void setCharacterSpacing(float spacing){stash->charSpacing = spacing;}
     
-        float stringWidth(const string& s);
-        float stringHeight(const string& s);
+        float stringWidth(const std::string& s);
+        float stringHeight(const std::string& s);
     
-        ofRectangle getStringBoundingBox(const string& s, float x, float y);
+        ofRectangle getStringBoundingBox(const std::string& s, float x, float y);
     
-        void drawString(const string& s, float x, float y);
+        void drawString(const std::string& s, float x, float y);
     
 	private:
 
@@ -168,13 +168,13 @@ class ofxFontStash{
 		struct ofx_sth_stash*	stash;
 
 		int texDimension;
-		vector<int>			fontIds;
+		std::vector<int>			fontIds;
 //		int					stashFontID;
 		bool				batchDrawing;
 
 		//fill in a string
 		//string walkAndFill(ofUTF8Ptr being, ofUTF8Ptr & iter, ofUTF8Ptr end);
-		string walkAndFill(const char * begin, const char *& iter, const char * end);
+		std::string walkAndFill(const char * begin, const char *& iter, const char * end);
 
 		bool isFontCode(const std::string& str) { return str.length()==2 && str[0] == '@'; }
 		bool isColorCode(const std::string& str) { return str.length()==9 && str[0] == '#'; }
