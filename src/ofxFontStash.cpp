@@ -93,7 +93,7 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 		}else {
 			stash->doKerning = 0; //kerning disabled by default
 			stash->charSpacing = 0.0; //spacing neutral by default
-			addFont(firstFontFile);
+			return addFont(firstFontFile);
 		}
 	}else{
 		ofLogError("ofxFontStash") << "Don't call setup() more than once!";
@@ -102,23 +102,24 @@ bool ofxFontStash::setup(string firstFontFile, float lineHeightPercent , int _te
 	return false;
 }
 
-void ofxFontStash::addFont(const std::string &fontFile)
+bool ofxFontStash::addFont(const std::string &fontFile)
 {
 	if (stash == NULL) {
 		ofLogError("ofxFontStash") << "addFont() error: font stash not initialized, call setup first";
-		return;
+		return false;
 	}
 
 	string fontPath = ofToDataPath(fontFile);
 	int fontId = ofx_sth_add_font(stash, fontPath.c_str());
 	if (fontId <= 0) {
 		ofLogError("ofxFontStash") << "Can't load font! \"" << fontPath.c_str() << "\"";
-		return;
+		return false;
 	}
 
 	fontIds.push_back(fontId);
 
-	ofLogNotice("ofxFontStash") << "Loaded font '" << fontFile << "' in texture ("<<texDimension<<" x "<<texDimension<<")";
+	ofLogNotice("ofxFontStash") << "Loaded font '" << fontFile << "' in texture ("<< texDimension << " x " << texDimension << ")";
+	return true;
 }
 
 

@@ -66,7 +66,7 @@ class ofxFontStash{
 
 
 		//for multi-font; to use with drawMultiColumnFormatted  (wip)
-		void addFont(const std::string& fontFile);
+		bool addFont(const std::string& fontFile);
 
 		//will draw text in one line, ignoring "\n"'s
 		float draw( const std::string& text, float size, float x, float y);
