@@ -450,7 +450,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 			}
 
 			float x, y, w, h;
-			ofx_sth_dim_text( stash, currentFontId, size * currentScale / dpiScale, word.c_str(), &x, &y, &w, &h);
+			ofx_sth_dim_text( stash, currentFontId, size * currentScale, word.c_str(), &x, &y, &w, &h);
 
 			allWords.push_back(word);
 			wordSizes.push_back(ofVec2f(w, h));
@@ -494,7 +494,7 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 			drawPointer.x != 0)
 		{
 			// jump one line down
-			drawPointer.y += lineHeight * size * wordScales[i];
+			drawPointer.y += lineHeight * size * dpiScale * wordScales[i];
 			drawPointer.x = 0;
 		}
 
