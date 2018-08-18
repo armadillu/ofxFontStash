@@ -206,6 +206,7 @@ ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float 
 						case OF_ALIGN_HORZ_LEFT: break;
 						case OF_ALIGN_HORZ_RIGHT: x = maxW - widths[i]; break;
 						case OF_ALIGN_HORZ_CENTER: x = (maxW - widths[i]) * 0.5; break;
+						default: break;
 					}
 					if(minDiffX > x) minDiffX = x;
 					ofx_sth_draw_text(stash,
