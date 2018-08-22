@@ -46,7 +46,7 @@ ofxFontStash.cpp and ofxFontStash.h have been created by Oriol Ferrer Mesià and
 	
 	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-The files fontstash.c, fontstash.h and main.c are licensed unter the zlib license:
+The files fontstash.c, fontstash.h and main.c are licensed under the zlib license:
 
     Copyright (c) 2011 Andreas Krinke andreas.krinke@gmx.de
     Copyright (c) 2009 Mikko Mononen memon@inside.org
