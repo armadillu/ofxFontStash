@@ -378,6 +378,8 @@ ofRectangle ofxFontStash::drawMultiLineColumn( string & _text, float size, float
 					if (i != numLines-1) text += "\n";
 				}
 			}
+            
+           		 _text = text;
 		}
 
 	}else{
