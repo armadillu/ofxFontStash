@@ -39,8 +39,8 @@
 #include "ofMain.h"
 
 extern "C" {
-	#include "fontstash.h"
-	#include "stb_truetype.h"
+	#include "../libs/fontstash/src/fontstash.h"
+	#include "../libs/fontstash/src/stb_truetype.h"
 }
 
 class ofxFontStash{
