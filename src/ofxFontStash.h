@@ -69,15 +69,17 @@ class ofxFontStash{
 		bool addFont(const std::string& fontFile);
 
 		//will draw text in one line, ignoring "\n"'s
-		float draw( const std::string& text, float size, float x, float y);
+		//fontID - draw font with fontID. FontID generated with each added font. 0 is for first/only font, 1 is for second, 2 is third and so on
+		float draw( const std::string& text, float size, float x, float y, int fontID = 0);
 
 		//text with "\n" will produce line breaks
 		//width only makes sense for align = OF_ALIGN_HORZ_CENTER - as it will center the text block to the rect defined by [x + width] 
-		ofRectangle drawMultiLine( const std::string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0);
+		ofRectangle drawMultiLine( const std::string& text, float fontSize, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0, int fontID = 0);
 
 		//fits text in a column of a certain width
 		//if you only want to find out the bbox size, send in dontDraw=true
 		//numLines will return the number of lines this has been split in
+		//fontID - draw font with fontID. FontID generated with each added font. 0 is for first/only font, 1 is for second, 2 is third and so on
 		ofRectangle drawMultiLineColumn(std::string &text,
 										float fontSize,
 										float x,
@@ -159,7 +161,7 @@ class ofxFontStash{
     
         ofRectangle getStringBoundingBox(const std::string& s, float x, float y);
     
-        void drawString(const std::string& s, float x, float y);
+        void drawString(const std::string& s, float x, float y, int fontID = 0);
     
 	private:
 
