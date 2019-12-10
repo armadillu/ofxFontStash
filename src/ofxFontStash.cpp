@@ -594,10 +594,10 @@ void ofxFontStash::drawMultiLineBatch( const string& text, float size, float x, 
 			stringstream ss(text);
 			string s;
 			int line = 0;
+			float dpiScale = stash->dpiScale;
 			while ( getline(ss, s, '\n') ) {
-				//cout << s << endl;
 				float dx = 0;
-				ofx_sth_draw_text( stash, fontIds[0], size, 0.0f, size * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
+				ofx_sth_draw_text( stash, fontIds[0], size, x * dpiScale , y * dpiScale + size * dpiScale * lineHeight * OFX_FONT_STASH_LINE_HEIGHT_MULT * line, s.c_str(), &dx );
 				line ++;
 			}
 		}else{
