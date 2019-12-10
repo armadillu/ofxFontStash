@@ -123,7 +123,7 @@ bool ofxFontStash::addFont(const std::string &fontFile)
 }
 
 
-float ofxFontStash::draw( const string& _text, float size, float x, float y){
+float ofxFontStash::draw( const string& _text, float size, float x, float y, int fontID){
 
 	string text = _text;
 	float dx = 0;
@@ -136,7 +136,7 @@ float ofxFontStash::draw( const string& _text, float size, float x, float y){
 		glPushMatrix();
 		glTranslatef(x, y, 0.0);
 		ofx_sth_begin_draw(stash);
-		ofx_sth_draw_text( stash, fontIds[0], size, 0, 0 , text.c_str(), &dx ); //this might draw
+		ofx_sth_draw_text( stash, fontIds[fontID], size, 0, 0 , text.c_str(), &dx ); //this might draw
 		ofx_sth_end_draw(stash); // this actually draws
 		glPopMatrix();
 	}else{
@@ -146,7 +146,7 @@ float ofxFontStash::draw( const string& _text, float size, float x, float y){
 }
 
 
-ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y, ofAlignHorz align, float width){
+ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float x, float y, ofAlignHorz align, float width, int fontID){
 
 	ofRectangle area;
 	
@@ -210,7 +210,7 @@ ofRectangle ofxFontStash::drawMultiLine( const string& _text, float size, float 
 					}
 					if(minDiffX > x) minDiffX = x;
 					ofx_sth_draw_text(stash,
-								  	fontIds[0],
+								  	fontIds[fontID],
 								  	size,
 									x * dpiScale,
 								  	ys[i],
@@ -786,6 +786,6 @@ ofRectangle ofxFontStash::getStringBoundingBox(const string& s, float x, float y
     return getBBox(s, fontSize, x, y);
 }
 
-void ofxFontStash::drawString(const string& s, float x, float y){
-    draw(s, fontSize, x, y);
+void ofxFontStash::drawString(const string& s, float x, float y, int fontID){
+    draw(s, fontSize, x, y, fontID);
 }
