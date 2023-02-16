@@ -536,17 +536,28 @@ ofVec2f ofxFontStash::drawMultiColumnFormatted(const string &_text, float size, 
 }
 
 
-float ofxFontStash::getFontHeight(float fontSize)
+float ofxFontStash::getFontHeight(float fontSize, int fontID)
 {
 	float asc, desc, lineh;
 
-	ofx_sth_vmetrics(stash, fontIds[0], fontSize, &asc, &desc, &lineh);
+	ofx_sth_vmetrics(stash, fontIds[fontID], fontSize, &asc, &desc, &lineh);
 
 	return asc - desc;
 }
 
+float ofxFontStash::getFontAscender(float fontSize, int fontID)
+{
+	float asc, desc, lineh;
+	ofx_sth_vmetrics(stash, fontIds[fontID], fontSize, &asc, &desc, &lineh);
+	return asc;
+}
 
-
+float ofxFontStash::getFontDescender(float fontSize, int fontID)
+{
+	float asc, desc, lineh;
+	ofx_sth_vmetrics(stash, fontIds[fontID], fontSize, &asc, &desc, &lineh);
+	return desc;
+}
 
 void ofxFontStash::beginBatch(){
 	if(stash != NULL){
@@ -669,7 +680,7 @@ bool ofxFontStash::getKerning(){
 }
 
 
-ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy, ofAlignHorz align, float width){
+ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, float yy, ofAlignHorz align, float width, int fontID){
 
 	ofRectangle totalArea;
 
@@ -683,7 +694,7 @@ ofRectangle ofxFontStash::getBBox( const string& text, float size, float xx, flo
 			
 			float dx = 0;
 			float w, h, x, y;
-			ofx_sth_dim_text( stash, fontIds[0], size / dpiScale, s.c_str(), &x, &y, &w, &h);
+			ofx_sth_dim_text( stash, fontIds[fontID], size / dpiScale, s.c_str(), &x, &y, &w, &h);
 			
 			totalArea.x = x + xx;
 			totalArea.y = yy + y ;
@@ -788,4 +799,8 @@ ofRectangle ofxFontStash::getStringBoundingBox(const string& s, float x, float y
 
 void ofxFontStash::drawString(const string& s, float x, float y, int fontID){
     draw(s, fontSize, x, y, fontID);
+}
+
+int ofxFontStash::getLoadedCount(){
+    return fontIds.size();
 }
