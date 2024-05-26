@@ -51,6 +51,7 @@
 // Unsupported platform
 #endif
 #elif __linux
+#include <GL/glew.h>
 #include <GL/gl.h>
 #elif __unix // all unices not caught above
 #include <GL/gl.h>
