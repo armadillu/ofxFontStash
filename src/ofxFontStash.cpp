@@ -132,13 +132,16 @@ float ofxFontStash::draw( const string& _text, float size, float x, float y, int
 	}
 
 	if (stash != NULL){
-		
-		glPushMatrix();
-		glTranslatef(x, y, 0.0);
-		ofx_sth_begin_draw(stash);
-		ofx_sth_draw_text( stash, fontIds[fontID], size, 0, 0 , text.c_str(), &dx ); //this might draw
-		ofx_sth_end_draw(stash); // this actually draws
-		glPopMatrix();
+		if(batchDrawing){
+			ofx_sth_draw_text(stash, fontIds[fontID], size, x * dpiScale, y * dpiScale, text.c_str(), &dx);
+		}else{
+			glPushMatrix();
+			glTranslatef(x, y, 0.0);
+			ofx_sth_begin_draw(stash);
+			ofx_sth_draw_text( stash, fontIds[fontID], size, 0, 0 , text.c_str(), &dx ); //this might draw
+			ofx_sth_end_draw(stash); // this actually draws
+			glPopMatrix();
+		}
 	}else{
 		ofLogError("ofxFontStash") << "Can't draw() without having been setup first!";
 	}
