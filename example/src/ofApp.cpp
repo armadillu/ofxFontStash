@@ -8,9 +8,9 @@ void ofApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(22, 22, 22, 255);
 
-	font.setup("Vera.ttf", 1.0, 1024, false, 8, 1.5);
-	font.addFont("VeraMono-Bold.ttf");
-	unicodeFont.setup("Arial Unicode.ttf", //font file, ttf only
+	font.setup("fonts/Vera.ttf", 1.0, 1024, false, 8, 1.5);
+	font.addFont("fonts/VeraMono-Bold.ttf");
+	unicodeFont.setup("fonts/Arial Unicode.ttf", //font file, ttf only
 					  1.0,					//lineheight percent
 					  1024,					//texture atlas dimension
 					  true,					//create mipmaps of the font, useful to scale down the font at smaller sizes
