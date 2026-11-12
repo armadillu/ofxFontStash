@@ -121,10 +121,12 @@ class ofxFontStash{
 		ofVec2f drawMultiColumnFormatted(const std::string &text, float size, float columnWidth, bool topLeftAlign = false, bool dryrun = false);
 
 
-		float getFontHeight(float fontSize);
+		float getFontHeight(float fontSize, int fontID = 0);
+		float getFontAscender(float fontSize, int fontID = 0);
+		float getFontDescender(float fontSize, int fontID = 0);
 
 		//if the text has newlines, it will be treated as if was called into drawMultiLine()
-		ofRectangle getBBox( const std::string& text, float size, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0 );
+		ofRectangle getBBox( const std::string& text, float size, float x, float y, ofAlignHorz align = OF_ALIGN_HORZ_LEFT, float width = 0, int fontID = 0 );
 	
 	
 		//interleave drawBatch* calls between begin() and end()
@@ -162,6 +164,7 @@ class ofxFontStash{
         ofRectangle getStringBoundingBox(const std::string& s, float x, float y);
     
         void drawString(const std::string& s, float x, float y, int fontID = 0);
+        int getLoadedCount();
     
 	private:
 
